@@ -104,42 +104,41 @@ class Graph:
                 print("%s\t-%s->\t%s" % (u, w, v))
 
 
-bipartite_g1 = Graph("./graphs/Bipartite/g1.txt")
-print("Bipartite graph g1:")
-bipartite_g1.print_graph()
-print("")
-bipartite_g2 = Graph("./graphs/Bipartite/g2.txt")
+if __name__ == "__main__":
+    bipartite_g1 = Graph("./graphs/Bipartite/g1.txt")
+    print("")
+    bipartite_g2 = Graph("./graphs/Bipartite/g2.txt")
 
-print("Bipartite graphs:")
-print("g1: The maximum possible flow is:", bipartite_g1.ford_fulkerson("s", "t"))
-print("g2: The maximum possible flow is:", bipartite_g2.ford_fulkerson("s", "t"))
+    print("Bipartite graphs:")
+    print("g1: The maximum possible flow is:", bipartite_g1.ford_fulkerson("s", "t"))
+    print("g2: The maximum possible flow is:", bipartite_g2.ford_fulkerson("s", "t"))
 
-#################################################
+    #################################################
 
-print("")
-fixedDegree_g1 = Graph("./graphs/FixedDegree/20v-3out-4min-355max.txt")
-fixedDegree_g2 = Graph("./graphs/FixedDegree/100v-5out-25min-200max.txt")
+    print("")
+    fixedDegree_g1 = Graph("./graphs/FixedDegree/20v-3out-4min-355max.txt")
+    fixedDegree_g2 = Graph("./graphs/FixedDegree/100v-5out-25min-200max.txt")
 
-print("Fixed Degree graphs:")
-print("g1: The maximum possible flow is:", fixedDegree_g1.ford_fulkerson("s", "t"))
-print("g2: The maximum possible flow is:", fixedDegree_g2.ford_fulkerson("s", "t"))
+    print("Fixed Degree graphs:")
+    print("g1: The maximum possible flow is:", fixedDegree_g1.ford_fulkerson("s", "t"))
+    print("g2: The maximum possible flow is:", fixedDegree_g2.ford_fulkerson("s", "t"))
 
-#################################################
+    #################################################
 
-mesh_g1 = Graph("./graphs/Mesh/smallMesh.txt")
-mesh_g2 = Graph("./graphs/Mesh/mediumMesh.txt")
+    mesh_g1 = Graph("./graphs/Mesh/smallMesh.txt")
+    mesh_g2 = Graph("./graphs/Mesh/mediumMesh.txt")
 
-print("")
-print("Mesh graphs:")
-print("g1: The maximum possible flow is:", mesh_g1.ford_fulkerson("s", "t"))
-print("g2: The maximum possible flow is:", mesh_g2.ford_fulkerson("s", "t"))
+    print("")
+    print("Mesh graphs:")
+    print("g1: The maximum possible flow is:", mesh_g1.ford_fulkerson("s", "t"))
+    print("g2: The maximum possible flow is:", mesh_g2.ford_fulkerson("s", "t"))
 
-#################################################
+    #################################################
 
-random_g1 = Graph("./graphs/Random/n10-m10-cmin5-cmax10-f30.txt")
-random_g2 = Graph("./graphs/Random/n100-m100-cmin10-cmax20-f949.txt")
+    random_g1 = Graph("./graphs/Random/n10-m10-cmin5-cmax10-f30.txt")
+    random_g2 = Graph("./graphs/Random/n100-m100-cmin10-cmax20-f949.txt")
 
-print("")
-print("Random graphs:")
-print("g1: The maximum possible flow is:", random_g1.ford_fulkerson("s", "t"))
-print("g2: The maximum possible flow is:", random_g2.ford_fulkerson("s", "t"))
+    print("")
+    print("Random graphs:")
+    print("g1: The maximum possible flow is:", random_g1.ford_fulkerson("s", "t"))
+    print("g2: The maximum possible flow is:", random_g2.ford_fulkerson("s", "t"))
