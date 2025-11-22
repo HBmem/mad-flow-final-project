@@ -1,107 +1,45 @@
-class Graph:
-    def __init__(self, file_path):
-        # The graph is represented as an adjacency list using a dictionary of dictionaries
-        # Example structure:
-        # {
-        #   'A': {'B': 10, 'C': 5}, node A has edges to B and C with weights 10 and 5 respectively
-        #   'B': {'C': 15}, node B has an edge to C with weight 15
-        #   'C': {}, node C has no outgoing edges
-        # }
-        self.graph = {}
-        self.load_graph(file_path)
+from graph import Graph
 
-    def load_graph(self, file_path):
-        with open(file_path, "r") as f:
-            for line in f:
-                fields = line.strip().split()
-                u = fields[0]  # source node
-                v = fields[1]  # destination node
-                w = fields[2]  # weight
-                self.add_edge(u, v, w)
 
-    def add_edge(self, u, v, w):
-        if u not in self.graph:
-            self.graph[u] = {}
-        if v not in self.graph:
-            self.graph[v] = {}
-        self.graph[u][v] = w  # edge from u to v with weight w
+def ford_fulkerson(graph, source, sink):
+    parent = {}
+    max_flow = 0
 
-    # BFS performs a breadth-first search to find an augmenting path
-    # It retruns True if there is a path from source 's' to sink 't', otherwise False
-    def BFS(self, s, t, parent):
-        visited = {key: False for key in self.graph}
-        queue = []
-        queue.append(s)
-        visited[s] = True
+    # Augment the flow while there is a path from source to sink
+    while graph.BFS(source, sink, parent):
+        path_flow = float("Inf")
+        s = sink
 
-        #  Perform BFS to find an augmenting path
-        while queue:
-            u = queue.pop(0)
+        # Find minimum residual capacity of the edges along the path filled by BFS
+        while s != source:
+            # Update path_flow to the minimum capacity found (i.e. bottleneck value)
+            path_flow = min(path_flow, int(graph.graph[parent[s]][s]))
+            s = parent[s]
 
-            # Explore all adjacent vertices of u
-            for v in self.graph[u]:
-                # If not visited and there is a positive capacity
-                if not visited[v] and int(self.graph[u][v]) > 0:
-                    queue.append(v)
-                    visited[v] = True
-                    parent[v] = u  # node u is the parent of v
+        max_flow += path_flow  # increase overall flow by the bottleneck value
 
-                    if v == t:
-                        return True
-        return False
+        v = sink
 
-    def ford_fulkerson(self, source, sink):
-        parent = {}
-        max_flow = 0
+        # Update residual capacities of the edges and reverse edges along the path
+        while v != source:
+            u = parent[v]
 
-        # Augment the flow while there is a path from source to sink
-        while self.BFS(source, sink, parent):
-            path_flow = float("Inf")
-            s = sink
+            # Decrease capacity of forward edge because we pushed that much additional flow through it. This is the leftover capacity.
+            graph.graph[u][v] = str(int(graph.graph[u][v]) - path_flow)
 
-            # Find minimum residual capacity of the edges along the path filled by BFS
-            while s != source:
-                # Update path_flow to the minimum capacity found (i.e. bottleneck value)
-                path_flow = min(path_flow, int(self.graph[parent[s]][s]))
-                s = parent[s]
+            # Ensure reverse edge exists
+            if v not in graph.graph:
+                graph.graph[v] = {}
 
-            max_flow += path_flow  # increase overall flow by the bottleneck value
+            # Add reverse edge if it doesn't exist, with initial capacity 0
+            if u not in graph.graph[v]:
+                graph.graph[v][u] = "0"
 
-            v = sink
+            # Set capacity of the backward edge to the bottleneck value because we have pushed that much flow through the forward edge
+            graph.graph[v][u] = str(int(graph.graph[v][u]) + path_flow)
+            v = parent[v]
 
-            # Update residual capacities of the edges and reverse edges along the path
-            while v != source:
-                u = parent[v]
-
-                # Decrease capacity of forward edge because we pushed that much additional flow through it. This is the leftover capacity.
-                self.graph[u][v] = str(int(self.graph[u][v]) - path_flow)
-
-                # Ensure reverse edge exists
-                if v not in self.graph:
-                    self.graph[v] = {}
-
-                # Add reverse edge if it doesn't exist, with initial capacity 0
-                if u not in self.graph[v]:
-                    self.graph[v][u] = "0"
-
-                # Set capacity of the backward edge to the bottleneck value because we have pushed that much flow through the forward edge
-                self.graph[v][u] = str(int(self.graph[v][u]) + path_flow)
-                v = parent[v]
-
-        return max_flow
-
-    # Utility function to print the graph
-    # Each edge is printed in the format: u -weight-> v
-    # or just the vertex if it has no outgoing edges
-    def print_graph(self):
-        for vertex in self.graph:
-            u = vertex
-            if not self.graph[u]:
-                print("%s" % (u))
-                continue
-            for v in self.graph[u]:
-                w = self.graph[u][v]
-                print("%s\t-%s->\t%s" % (u, w, v))
+    return max_flow
 
 
 if __name__ == "__main__":
@@ -110,8 +48,8 @@ if __name__ == "__main__":
     bipartite_g2 = Graph("./graphs/Bipartite/g2.txt")
 
     print("Bipartite graphs:")
-    print("g1: The maximum possible flow is:", bipartite_g1.ford_fulkerson("s", "t"))
-    print("g2: The maximum possible flow is:", bipartite_g2.ford_fulkerson("s", "t"))
+    print("g1: The maximum possible flow is:", ford_fulkerson(bipartite_g1, "s", "t"))
+    print("g2: The maximum possible flow is:", ford_fulkerson(bipartite_g2, "s", "t"))
 
     #################################################
 
@@ -120,8 +58,8 @@ if __name__ == "__main__":
     fixedDegree_g2 = Graph("./graphs/FixedDegree/100v-5out-25min-200max.txt")
 
     print("Fixed Degree graphs:")
-    print("g1: The maximum possible flow is:", fixedDegree_g1.ford_fulkerson("s", "t"))
-    print("g2: The maximum possible flow is:", fixedDegree_g2.ford_fulkerson("s", "t"))
+    print("g1: The maximum possible flow is:", ford_fulkerson(fixedDegree_g1, "s", "t"))
+    print("g2: The maximum possible flow is:", ford_fulkerson(fixedDegree_g2, "s", "t"))
 
     #################################################
 
@@ -130,8 +68,8 @@ if __name__ == "__main__":
 
     print("")
     print("Mesh graphs:")
-    print("g1: The maximum possible flow is:", mesh_g1.ford_fulkerson("s", "t"))
-    print("g2: The maximum possible flow is:", mesh_g2.ford_fulkerson("s", "t"))
+    print("g1: The maximum possible flow is:", ford_fulkerson(mesh_g1, "s", "t"))
+    print("g2: The maximum possible flow is:", ford_fulkerson(mesh_g2, "s", "t"))
 
     #################################################
 
@@ -140,5 +78,5 @@ if __name__ == "__main__":
 
     print("")
     print("Random graphs:")
-    print("g1: The maximum possible flow is:", random_g1.ford_fulkerson("s", "t"))
-    print("g2: The maximum possible flow is:", random_g2.ford_fulkerson("s", "t"))
+    print("g1: The maximum possible flow is:", ford_fulkerson(random_g1, "s", "t"))
+    print("g2: The maximum possible flow is:", ford_fulkerson(random_g2, "s", "t"))
