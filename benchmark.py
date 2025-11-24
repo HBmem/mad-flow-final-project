@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import time
 import os
+import sys
 import json
 import csv
 import statistics
@@ -12,14 +13,46 @@ from pathlib import Path
 from graph import Graph
 
 
-def run_max_flow(graph_path, source, sink, mad_flow_script):
+def detect_python_command():
+    """Detect whether to use 'python3' or 'python' command."""
+    # Try python3 first
+    try:
+        result = subprocess.run(
+            ["python3", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if result.returncode == 0:
+            return "python3"
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+
+    # Fall back to python
+    try:
+        result = subprocess.run(
+            ["python", "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if result.returncode == 0:
+            return "python"
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        pass
+
+    # Default to python3 if detection fails
+    return "python3"
+
+
+def run_max_flow(graph_path, source, sink, mad_flow_script, python_cmd="python3"):
     """Run mad-flow.py on a graph and measure execution time."""
     start_time = time.perf_counter()
 
     try:
         result = subprocess.run(
             [
-                "python3",
+                python_cmd,
                 mad_flow_script,
                 "-g",
                 graph_path,
@@ -116,7 +149,15 @@ def process_single_graph(args_tuple):
     Worker function to process a single graph file.
     Takes a tuple of arguments for multiprocessing compatibility.
     """
-    graph_file, graph_type, num_runs, source, sink, mad_flow_script = args_tuple
+    (
+        graph_file,
+        graph_type,
+        num_runs,
+        source,
+        sink,
+        mad_flow_script,
+        python_cmd,
+    ) = args_tuple
 
     # Load graph and get size information
     try:
@@ -124,6 +165,8 @@ def process_single_graph(args_tuple):
         num_vertices = graph.get_num_vertices()
         num_edges = graph.get_num_edges()
     except Exception as e:
+        error_msg = f"ERROR: {graph_type}/{graph_file.name} - Failed to load graph: {e}"
+        print(error_msg, file=sys.stderr)
         return {
             "graph_file": graph_file.name,
             "graph_type": graph_type,
@@ -139,11 +182,15 @@ def process_single_graph(args_tuple):
 
     for run in range(num_runs):
         elapsed, flow, error = run_max_flow(
-            str(graph_file), source, sink, mad_flow_script
+            str(graph_file), source, sink, mad_flow_script, python_cmd
         )
 
         if error:
-            errors.append(f"Run {run+1}: {error}")
+            error_msg = f"Run {run+1}: {error}"
+            errors.append(error_msg)
+            print(
+                f"ERROR: {graph_type}/{graph_file.name} - {error_msg}", file=sys.stderr
+            )
         elif elapsed is not None:
             times.append(elapsed)
             max_flow_values.append(flow)
@@ -151,18 +198,25 @@ def process_single_graph(args_tuple):
                 max_flow_value = flow
             elif max_flow_value != flow:
                 # Inconsistent max_flow across runs - this is an error!
+                error_msg = f"Inconsistent max_flow values: expected {max_flow_value}, got {flow} on run {run+1}"
+                print(
+                    f"ERROR: {graph_type}/{graph_file.name} - {error_msg}",
+                    file=sys.stderr,
+                )
                 return {
                     "graph_file": graph_file.name,
                     "graph_type": graph_type,
-                    "error": f"Inconsistent max_flow values: expected {max_flow_value}, got {flow} on run {run+1}",
+                    "error": error_msg,
                     "success": False,
                 }
 
     if not times:
+        error_msg = f"All {num_runs} runs failed"
+        print(f"ERROR: {graph_type}/{graph_file.name} - {error_msg}", file=sys.stderr)
         return {
             "graph_file": graph_file.name,
             "graph_type": graph_type,
-            "error": f"All runs failed",
+            "error": error_msg,
             "errors": errors,
             "success": False,
         }
@@ -195,6 +249,7 @@ def benchmark_graphs(
     sink,
     mad_flow_script,
     num_processes,
+    python_cmd="python3",
 ):
     """Benchmark all graphs in the input directory using multiprocessing."""
     input_path = Path(input_dir)
@@ -257,7 +312,15 @@ def benchmark_graphs(
 
             # Add to tasks
             tasks.append(
-                (graph_file, normalized_type, num_runs, source, sink, mad_flow_script)
+                (
+                    graph_file,
+                    normalized_type,
+                    num_runs,
+                    source,
+                    sink,
+                    mad_flow_script,
+                    python_cmd,
+                )
             )
 
             # Track graph types
@@ -266,8 +329,8 @@ def benchmark_graphs(
             graph_type_info[normalized_type].append(graph_file.name)
 
     if not tasks:
-        print("\nNo valid graph files found to process")
-        return
+        print("\nERROR: No valid graph files found to process")
+        return False
 
     # Process graphs in parallel
     print(f"\nProcessing {len(tasks)} graphs using {num_processes} processes...")
@@ -275,8 +338,11 @@ def benchmark_graphs(
     with multiprocessing.Pool(processes=num_processes) as pool:
         all_results = pool.map(process_single_graph, tasks)
 
-    # Group results by graph type
+    # Group results by graph type and track failures
     results_by_type = {}
+    failed_graphs = []
+    successful_count = 0
+
     for result in all_results:
         graph_type = result["graph_type"]
 
@@ -289,6 +355,7 @@ def benchmark_graphs(
                 k: v for k, v in result.items() if k not in ["graph_type", "success"]
             }
             results_by_type[graph_type].append(clean_result)
+            successful_count += 1
 
             stats = result["statistics"]
             print(
@@ -297,9 +364,20 @@ def benchmark_graphs(
                 f"max={stats['max']:.6f}s, stddev={stats['stddev']:.6f}s"
             )
         else:
+            failed_graphs.append(f"{graph_type}/{result['graph_file']}")
             print(
                 f"  {graph_type}/{result['graph_file']}: ERROR - {result.get('error', 'Unknown error')}"
             )
+
+    # Check if all graphs failed
+    if successful_count == 0:
+        print("\n" + "=" * 60)
+        print("FATAL ERROR: All graphs failed to process!")
+        print("=" * 60)
+        print(f"\nFailed graphs ({len(failed_graphs)}):")
+        for failed in failed_graphs:
+            print(f"  - {failed}")
+        return False
 
     # Save results for each graph type
     print("\nSaving results...")
@@ -307,6 +385,13 @@ def benchmark_graphs(
         if results:
             save_results(output_path, algorithm, graph_type, results)
             print(f"  Saved results for {graph_type} ({len(results)} graphs)")
+
+    # Report any failures
+    if failed_graphs:
+        print(f"\n⚠️  WARNING: {len(failed_graphs)} graph(s) failed (see errors above)")
+        print(f"✓  Successfully processed {successful_count} graph(s)")
+
+    return True
 
 
 def save_results(output_path, algorithm, graph_type, results):
@@ -439,6 +524,10 @@ def main():
 
     args = parser.parse_args()
 
+    # Detect python command
+    python_cmd = detect_python_command()
+    print(f"Using Python command: {python_cmd}")
+
     # Validate algorithm implementation
     if args.algorithm != "ford_fulkerson":
         print(f"WARNING: Algorithm '{args.algorithm}' not yet implemented.")
@@ -484,7 +573,7 @@ def main():
     print(f"  Sink node: {args.sink}")
 
     # Run benchmark
-    benchmark_graphs(
+    success = benchmark_graphs(
         args.input,
         args.output,
         args.algorithm,
@@ -494,9 +583,14 @@ def main():
         args.sink,
         args.mad_flow_script,
         args.processes,
+        python_cmd,
     )
 
-    print("\nBenchmark complete!")
+    if not success:
+        print("\nBenchmark FAILED - no results were saved")
+        return 1
+
+    print("\n✓ Benchmark complete!")
     return 0
 
 

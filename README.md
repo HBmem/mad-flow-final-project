@@ -129,8 +129,10 @@ b t 15
 
 ## Requirements
 
-- Python 3.x
+- Python 3.x (either `python3` or `python` command)
 - matplotlib: `pip3 install matplotlib` (for plotting only)
+
+**Note:** The `benchmark.py` script automatically detects whether to use `python3` or `python` command based on system availability.
 
 ## Architecture
 
