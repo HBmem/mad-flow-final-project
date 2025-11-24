@@ -8,6 +8,8 @@ class Graph:
         #   'C': {}, node C has no outgoing edges
         # }
         self.graph = {}
+        self.num_vertices = 0
+        self.num_edges = 0
         self.load_graph(file_path)
 
     def load_graph(self, file_path):
@@ -22,9 +24,12 @@ class Graph:
     def add_edge(self, u, v, w):
         if u not in self.graph:
             self.graph[u] = {}
+            self.num_vertices += 1
         if v not in self.graph:
             self.graph[v] = {}
+            self.num_vertices += 1
         self.graph[u][v] = w  # edge from u to v with weight w
+        self.num_edges += 1
 
     # BFS performs a breadth-first search to find an augmenting path
     # It returns True if there is a path from source 's' to sink 't', otherwise False
@@ -49,6 +54,14 @@ class Graph:
                     if v == t:
                         return True
         return False
+
+    def get_num_vertices(self):
+        """Return the number of vertices in the graph."""
+        return self.num_vertices
+
+    def get_num_edges(self):
+        """Return the number of edges in the graph."""
+        return self.num_edges
 
     # Utility function to print the graph
     # Each edge is printed in the format: u -weight-> v
