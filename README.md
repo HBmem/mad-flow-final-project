@@ -51,17 +51,32 @@ Runs max flow algorithms multiple times and collects timing statistics.
 python3 benchmark.py -i <input_dir> [options]
 
 Options:
-  -i, --input      Input directory with graph subdirectories (required)
-  -o, --output     Output directory for results (default: BenchmarkResultsData)
-  -a, --algorithm  Algorithm: ford_fulkerson, scaling_ford_fulkerson, preflow_push (default: ford_fulkerson)
-  -t, --types      Graph types to test: bipartite,mesh,random,fixeddegree (default: all)
-  -r, --runs       Number of runs per graph (default: 10)
-  -s, --source     Source node (default: 's')
-  --sink           Sink node (default: 't')
-  --clean          Remove output directory before starting (safeguard against accidental overwrites)
+  -i, --input       Input directory with graph subdirectories (required)
+  -o, --output      Output directory for results (default: BenchmarkResultsData)
+  -a, --algorithm   Algorithm: ford_fulkerson, scaling_ford_fulkerson, preflow_push (default: ford_fulkerson)
+  -t, --types       Graph types to test: bipartite,mesh,random,fixeddegree (default: all)
+  -r, --runs        Number of runs per graph (default: 10)
+  -p, --processes   Number of parallel processes (default: CPU count)
+  -s, --source      Source node (default: 's')
+  --sink            Sink node (default: 't')
+  --clean           Remove output directory before starting (safeguard against accidental overwrites)
 ```
 
 **Output:** Results organized as `BenchmarkResultsData/algorithm/graph_type/results.{json,csv}` with statistics: min, max, mean, median, stddev.
+
+**Performance:** Uses multiprocessing to benchmark graphs in parallel. Automatically detects CPU count but can be customized with `-p` flag.
+
+**Examples:**
+```bash
+# Use all available CPU cores (default)
+python3 benchmark.py -i graphGenerationCode -r 10
+
+# Limit to 4 parallel processes
+python3 benchmark.py -i graphGenerationCode -r 10 -p 4
+
+# Single-threaded for comparison
+python3 benchmark.py -i graphGenerationCode -r 10 -p 1
+```
 
 **Note:** If output directory exists, you must use `--clean` or specify a different output directory to prevent accidental data loss.
 
@@ -120,6 +135,8 @@ b t 15
 ## Architecture
 
 The system is built on the `Graph` class which tracks vertices/edges efficiently using cached counters (O(1) lookups). The `mad-flow.py` script supports JSON output mode for robust machine parsing by the benchmark script.
+
+**Performance:** The benchmark script uses Python's `multiprocessing` module to analyze multiple graphs in parallel, automatically utilizing all available CPU cores for faster execution on multicore systems.
 
 **Graph types supported:** Bipartite, Mesh, Random, FixedDegree
 
