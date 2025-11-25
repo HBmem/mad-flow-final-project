@@ -1,4 +1,5 @@
 __pycache__/
 *.zip
+*.class
 BenchmarkResultsData/
 BenchmarkResultsPlots/
