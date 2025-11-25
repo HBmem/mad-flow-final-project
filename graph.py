@@ -54,6 +54,31 @@ class Graph:
                     if v == t:
                         return True
         return False
+    
+    # delta_BFS performs a breadth-first search to find an augmenting path
+    # with the constraint that only edges with capacity >= delta_threshold are considered
+    def delta_BFS(self, s, t, parent, delta_threshold):
+
+        visited = {key: False for key in self.graph}
+        queue = []
+        queue.append(s)
+        visited[s] = True
+
+        # Perform BFS to find an augmenting path
+        while queue:
+            u = queue.pop(0)
+
+            # Explore all adjacent vertices of u
+            for v in self.graph[u]:
+                # If not visited and there is a edge with capacity >= delta_threshold
+                if not visited[v] and int(self.graph[u][v]) >= delta_threshold:
+                    queue.append(v)
+                    visited[v] = True
+                    parent[v] = u  # node u is the parent of v
+
+                    if v == t:
+                        return True
+        return False
 
     def get_num_vertices(self):
         """Return the number of vertices in the graph."""
