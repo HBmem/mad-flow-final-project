@@ -5,7 +5,10 @@
  * Apaporn Boonyaratta, Richard Hill, Quang Lu, & David Thaler
  * November 21, 2008
  */
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Random;
 
@@ -14,24 +17,24 @@ import java.util.Random;
  * mesh graphs have edges from s to each node in the first column, from each
  * internal node to the node on its right, both ways between every internal node
  * and the nodes above and below it, and from the last column nodes to the sink.
- * 
+ *
  * The file format is the standard TCSS 343/543 format of 'first vertex' 'second
  * vertex' 'capacity'. The program takes command line arguments. They are: [# of
  * rows] [# of columns][capacity or maximum capacity][filename][-cc flag]. All
  * arguments are optional. If you enter no arguments, you get a 3 x 4 mesh with
  * capacity of 1 on all edges, printed to System.out. The arguments are:
- * 
+ *
  * #rows/columns - self-explanatory...defaults to 3x4 if no arguments are given
- * 
+ *
  * capacity - defaults to 1(fixed) if <3 arguments. Otherwise random on the
  * range 1 to capacity, unless '-cc' set.
- * 
+ *
  * filename - the name of file to write to. Defaults to System.out if <4
  * parameters (or if -cc is last parameter)
- * 
+ *
  * -cc flag...With at least the first three parameters specified, ending the
  * line with '-cc' will cause edge capacities to have a constant value of c.
- * 
+ *
  * @author TCSS 543 group 2: Apaporn Boonyaratta, Richard Hill, Quang Lu, &
  *         David Thaler
  * @version November 21, 2008
@@ -87,7 +90,7 @@ public class MeshGenerator {
    * graph. The line reads 'first node' 'second node' capacity , where the nodes
    * are represented as (row #, column #). This method should be called with the
    * correct capacity for this node; it doesn't generate them.
-   * 
+   *
    * @param i1 -
    *          first node row #
    * @param j1-
@@ -107,7 +110,7 @@ public class MeshGenerator {
    * Utility method to generate edge capacities for mesh graph generator. These
    * are constant with value c if the constCap flag is set, random on the range
    * from 1 to c otherwise.
-   * 
+   *
    * @return either c or a random number from 1 to c
    */
   private int capacity() {
@@ -119,11 +122,10 @@ public class MeshGenerator {
   }
 
   /**
-   * Constructor for mesh generator parses the command line arguments and sets
-   * the defaults. See the class comment for arguments/defaults.
-   * 
+   * Constructor for mesh generator with command-line arguments.
+   *
    * @param args -
-   *          the command line arguments. See class comment.
+   *          the command line arguments: [rows] [columns] [capacity] [filename] [-cc]
    */
   public MeshGenerator(String[] args) {
     rand = new Random();
@@ -162,13 +164,59 @@ public class MeshGenerator {
   }
 
   /**
-   * @param args-
-   *          command line args
+   * Constructor for mesh generator with interactive prompts.
    */
-  public static void main(String[] args) {
+  public MeshGenerator() throws Exception {
+    rand = new Random();
 
-    MeshGenerator mesh = new MeshGenerator(args);
+    System.out.println("\n\n---------------------------------------------------");
+    System.out.print("Enter number of rows: \t\t\t\t");
+    m = GetInt();
+    System.out.print("Enter number of columns: \t\t\t");
+    n = GetInt();
+    System.out.print("Enter maximum capacity: \t\t\t");
+    c = GetInt();
+    System.out.print("Use constant capacity? (y/n): \t\t");
+    String response = GetString();
+    constCap = response.toLowerCase().startsWith("y");
+    System.out.print("Enter output file name (without .txt): \t");
+    String fileName = GetString() + ".txt";
+    System.out.println("---------------------------------------------------\n");
+
+    try {
+      out = new PrintStream(fileName);
+    } catch (FileNotFoundException e) {
+      System.err.println("Exception thrown on file formation: " + fileName);
+      out = System.out;
+    }
+  }
+
+  /**
+   * @param args-
+   *          command line args (optional - will prompt if not provided)
+   */
+  public static void main(String[] args) throws Exception {
+    MeshGenerator mesh;
+
+    if (args.length > 0) {
+      mesh = new MeshGenerator(args);
+    } else {
+      mesh = new MeshGenerator();
+    }
+
     mesh.generate();
+    System.out.println("\nDONE!");
+  }
+
+  // Helper functions
+  public static String GetString() throws IOException {
+    BufferedReader stringIn = new BufferedReader(new InputStreamReader(System.in));
+    return stringIn.readLine();
+  }
+
+  public static int GetInt() throws IOException {
+    String aux = GetString();
+    return Integer.parseInt(aux);
   }
 
 }
