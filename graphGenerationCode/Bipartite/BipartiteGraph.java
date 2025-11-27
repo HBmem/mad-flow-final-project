@@ -25,8 +25,8 @@ public class BipartiteGraph
 		System.out.print("Enter maximum capacity: \t\t\t");
 		maxCapacity = GetInt();
 		String directory = System.getProperty("user.dir");
-		System.out.print("Enter the output file name: \t\t\t");
-		String fileName = GetString() + ".txt";	
+		System.out.print("Enter the output file name (without .txt): \t\t\t");
+		String fileName = GetString() + ".txt";
 		System.out.println("---------------------------------------------------\n");
 
 		try
@@ -45,10 +45,10 @@ public class BipartiteGraph
 						edge[i][j] = 0;
 				}
 			}
-			
+
 			System.out.println("-----------------------------------------");
 			System.out.println("\tSource\tSink\tCapacity");
-			System.out.println("-----------------------------------------");			
+			System.out.println("-----------------------------------------");
 
 			//computing the edges out of source
 			for (i = 0; i < n; i++)
@@ -62,7 +62,7 @@ public class BipartiteGraph
 			for(i=0; i<n; i++)
 			{
 				for(j=0; j<m; j++)
-				{				
+				{
 					if(edge[i][j] > 0)
 					{
 						edge[i][j] = Math.floor(minCapacity + (edge[i][j] * (maxCapacity - minCapacity + 1)));
@@ -91,20 +91,20 @@ public class BipartiteGraph
 	}
 
 	//helper functions
-	public static String GetString() throws IOException 
+	public static String GetString() throws IOException
 	{
 		BufferedReader stringIn = new BufferedReader (new
 			InputStreamReader(System.in));
 		return  stringIn.readLine();
 	}
 
-	public static int GetInt() throws IOException 
+	public static int GetInt() throws IOException
 	{
 		String aux = GetString();
 		return Integer.parseInt(aux);
 	}
 
-	public static double GetReal() throws IOException 
+	public static double GetReal() throws IOException
 	{
 		String  aux = GetString();
 		Double d  = new Double(aux);
