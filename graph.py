@@ -33,7 +33,7 @@ class Graph:
 
     # BFS performs a breadth-first search to find an augmenting path
     # It returns True if there is a path from source 's' to sink 't', otherwise False
-    def BFS(self, s, t, parent):
+    def BFS(self, s, t, parent, capacity_threshold=1):
         visited = {key: False for key in self.graph}
         queue = []
         queue.append(s)
@@ -46,32 +46,7 @@ class Graph:
             # Explore all adjacent vertices of u
             for v in self.graph[u]:
                 # If not visited and there is a positive capacity
-                if not visited[v] and int(self.graph[u][v]) > 0:
-                    queue.append(v)
-                    visited[v] = True
-                    parent[v] = u  # node u is the parent of v
-
-                    if v == t:
-                        return True
-        return False
-    
-    # delta_BFS performs a breadth-first search to find an augmenting path
-    # with the constraint that only edges with capacity >= delta_threshold are considered
-    def delta_BFS(self, s, t, parent, delta_threshold):
-
-        visited = {key: False for key in self.graph}
-        queue = []
-        queue.append(s)
-        visited[s] = True
-
-        # Perform BFS to find an augmenting path
-        while queue:
-            u = queue.pop(0)
-
-            # Explore all adjacent vertices of u
-            for v in self.graph[u]:
-                # If not visited and there is a edge with capacity >= delta_threshold
-                if not visited[v] and int(self.graph[u][v]) >= delta_threshold:
+                if not visited[v] and int(self.graph[u][v]) >= capacity_threshold:
                     queue.append(v)
                     visited[v] = True
                     parent[v] = u  # node u is the parent of v
