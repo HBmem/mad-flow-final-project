@@ -7,7 +7,7 @@ m = num edges
 
 FF: O(nC), C = sum of capacities out of s
 SFF: O(n*log2(C))
-PFP: ?
+PFP: Generic O(n2m), Max Height Selection Variant: O(n^3)
 
 ## Graph Generation
 
@@ -282,7 +282,7 @@ For each of the 4 graph types, generate:
 
 ### Plot File Organization
 
-```
+```text
 BenchmarkResultsPlots/
 ├── bipartite/
 │   ├── mean_runtime.png
