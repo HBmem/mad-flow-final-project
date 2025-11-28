@@ -24,10 +24,18 @@ def read_results(results_dir, algorithm, graph_type):
 
 
 def plot_bar_chart(
-    x_values, y_values, labels, title, xlabel, ylabel, output_path, annotations=None
+    x_values,
+    y_values,
+    labels,
+    title,
+    xlabel,
+    ylabel,
+    output_path,
+    annotations=None,
+    max_flows=None,
 ):
     """Create a bar chart and save to file."""
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 7))
 
     # Create bars
     bars = ax.bar(range(len(x_values)), y_values, color="steelblue", alpha=0.8)
@@ -57,17 +65,66 @@ def plot_bar_chart(
             fontsize=8,
         )
 
+    # Calculate threshold for "small" bars (labels should float above)
+    max_height = max(y_values) if y_values else 1
+    small_bar_threshold = max_height * 0.15  # Bars under 15% of max are "small"
+
     # Add annotations if provided (for n×m plots)
     if annotations:
         for i, (bar, annotation) in enumerate(zip(bars, annotations)):
+            height = bar.get_height()
+            if height < small_bar_threshold:
+                # Float above bar for small bars (higher to avoid runtime label)
+                y_pos = height + max_height * 0.06
+                va = "bottom"
+            else:
+                # Center inside bar for large bars
+                y_pos = height * 0.5
+                va = "center"
             ax.text(
                 bar.get_x() + bar.get_width() / 2.0,
-                bar.get_height() * 0.5,
+                y_pos,
                 annotation,
                 ha="center",
-                va="center",
+                va=va,
                 fontsize=7,
-                bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.5),
+                bbox=dict(
+                    boxstyle="round,pad=0.3",
+                    facecolor="lightyellow",
+                    alpha=0.9,
+                    edgecolor="orange",
+                ),
+            )
+
+    # Add max_flow annotations inside bars at the bottom if provided
+    if max_flows:
+        for i, (bar, mf) in enumerate(zip(bars, max_flows)):
+            height = bar.get_height()
+            if height < small_bar_threshold:
+                # Float above bar (stack above n/m annotation)
+                y_pos = height + max_height * 0.16
+                va = "bottom"
+            else:
+                # Fixed distance below n/m box (which is at height * 0.5)
+                # But ensure it stays inside the bar
+                ideal_y = height * 0.5 - max_height * 0.08
+                min_y = height * 0.08  # Don't go below 8% of bar height
+                y_pos = max(ideal_y, min_y)
+                va = "top" if y_pos == ideal_y else "bottom"
+            ax.text(
+                bar.get_x() + bar.get_width() / 2.0,
+                y_pos,
+                f"f={mf:,}",
+                ha="center",
+                va=va,
+                fontsize=6,
+                color="white",
+                fontweight="bold",
+                bbox=dict(
+                    boxstyle="round,pad=0.2",
+                    facecolor="darkgreen",
+                    alpha=0.9,
+                ),
             )
 
     plt.tight_layout()
@@ -88,6 +145,7 @@ def generate_metric_plots(
     xlabel,
     algorithm,
     annotations=None,
+    max_flows=None,
 ):
     """Generate mean and max plots for a specific metric (vertices, edges, or size)."""
     # Mean time plot
@@ -100,6 +158,7 @@ def generate_metric_plots(
         ylabel="Mean Runtime (seconds)",
         output_path=output_dir / "mean_runtime.png",
         annotations=annotations,
+        max_flows=max_flows,
     )
 
     # Max time plot
@@ -112,6 +171,7 @@ def generate_metric_plots(
         ylabel="Max Runtime (seconds)",
         output_path=output_dir / "max_runtime.png",
         annotations=annotations,
+        max_flows=max_flows,
     )
 
 
@@ -132,6 +192,7 @@ def generate_plots_for_graph_type(results_dir, plots_dir, algorithm, graph_type)
     num_edges = [r["num_edges"] for r in results]
     mean_times = [r["statistics"]["mean"] for r in results]
     max_times = [r["statistics"]["max"] for r in results]
+    max_flows = [r.get("max_flow", 0) for r in results]  # Extract max_flow
 
     # Create output directory for this graph type
     output_dir = Path(plots_dir) / algorithm / graph_type
@@ -141,14 +202,15 @@ def generate_plots_for_graph_type(results_dir, plots_dir, algorithm, graph_type)
     products = [v * e for v, e in zip(num_vertices, num_edges)]
     annotations = [f"n={v}\nm={e}" for v, e in zip(num_vertices, num_edges)]
 
-    # Sort by product
+    # Sort by product (include max_flows in sort)
     sorted_by_product = sorted(
-        zip(products, mean_times, max_times, annotations), key=lambda x: x[0]
+        zip(products, mean_times, max_times, annotations, max_flows), key=lambda x: x[0]
     )
     products_sorted = [x[0] for x in sorted_by_product]
     mean_times_by_product = [x[1] for x in sorted_by_product]
     max_times_by_product = [x[2] for x in sorted_by_product]
     annotations_sorted = [x[3] for x in sorted_by_product]
+    max_flows_sorted = [x[4] for x in sorted_by_product]
 
     generate_metric_plots(
         graph_type=graph_type,
@@ -161,6 +223,7 @@ def generate_plots_for_graph_type(results_dir, plots_dir, algorithm, graph_type)
         xlabel="Input Size (vertices × edges)",
         algorithm=algorithm,
         annotations=annotations_sorted,
+        max_flows=max_flows_sorted,
     )
 
     return 2  # Number of plots generated (mean and max)

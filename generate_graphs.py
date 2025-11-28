@@ -24,16 +24,55 @@ OUTPUT_DIR = Path("GeneratedGraphs")
 GRAPH_GEN_DIR = Path("graphGenerationCode")
 
 # Fixed parameters for each graph type
-BIPARTITE_PARAMS = {"probability": 0.5, "min_cap": 1, "max_cap": 10}
-FIXED_DEGREE_PARAMS = {"edges_per_node": 5, "min_cap": 1, "max_cap": 10}
-MESH_PARAMS = {"capacity": 5, "constant": True}
-RANDOM_PARAMS = {"density": 30, "min_cap": 1, "max_cap": 10}
+# NOTE: Tuned for ~5 minute max Ford-Fulkerson runtimes
+# Ford-Fulkerson is O(V*E*max_flow), so we need high max_flow for longer runtimes
+BIPARTITE_PARAMS = {"probability": 0.5, "min_cap": 1, "max_cap": 1000}
+FIXED_DEGREE_PARAMS = {
+    "edges_per_node": 30,  # 30 edges to create more flow paths → higher max_flow
+    "min_cap": 1,
+    "max_cap": 1000,
+}
+MESH_PARAMS = {"capacity": 1000, "constant": True}  # Higher capacity for more flow
+RANDOM_PARAMS = {
+    "density": 30,  # density 30 for more edges and higher max_flow
+    "min_cap": 1,
+    "max_cap": 1000,
+}
 
-# Graph sizes to generate
-BIPARTITE_SIZES = [5, 10, 20, 30, 40, 50, 75, 100, 125, 150]  # source = sink nodes
-FIXED_DEGREE_SIZES = [15, 25, 50, 100, 150, 200, 300, 400, 500, 750]  # vertices
-MESH_SIZES = [5, 8, 10, 15, 20, 25, 30, 35, 40, 50]  # rows = cols
-RANDOM_SIZES = [15, 25, 50, 75, 100, 150, 200, 250, 300, 400]  # vertices
+# Graph sizes to generate - scaled for ~5 minute max Ford-Fulkerson runtime
+# FF is O(V*E*f), bipartite scales as n^4, so 2x size ≈ 16x runtime
+BIPARTITE_SIZES = [
+    50,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    800,
+    1000,
+    1200,
+]  # source = sink nodes (largest ~5 min)
+
+# FixedDegree needs high edges_per_node (30) to get meaningful max_flow
+FIXED_DEGREE_SIZES = [
+    100,
+    250,
+    500,
+    1000,
+    1500,
+    2000,
+    2500,
+    3000,
+    3500,
+    4000,
+]  # vertices
+
+# Mesh scales more slowly - need larger sizes
+MESH_SIZES = [20, 40, 60, 80, 100, 125, 150, 200, 250, 300]  # rows = cols
+
+# Random with density 30 for more edges and higher max_flow
+RANDOM_SIZES = [100, 200, 400, 600, 800, 1000, 1250, 1500, 1750, 2000]  # vertices
 
 
 # =============================================================================

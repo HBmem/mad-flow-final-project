@@ -26,80 +26,85 @@ The script will:
 
 ## Fixed Parameters
 
-| Graph Type   | Fixed Parameters                         |
-|--------------|------------------------------------------|
-| Bipartite    | probability=0.5, min_cap=1, max_cap=10   |
-| FixedDegree  | edges_per_node=5, min_cap=1, max_cap=10  |
-| Mesh         | capacity=5, constant_capacity=true       |
-| Random       | density=30, min_cap=1, max_cap=10        |
+| Graph Type   | Fixed Parameters                              |
+|--------------|-----------------------------------------------|
+| Bipartite    | probability=0.5, min_cap=1, max_cap=1000      |
+| FixedDegree  | **edges_per_node=30**, min_cap=1, max_cap=1000|
+| Mesh         | **capacity=1000**, constant_capacity=true     |
+| Random       | **density=30**, min_cap=1, max_cap=1000       |
+
+> **Target:** ~5 minute max Ford-Fulkerson runtime.
+>
+> **Note on connectivity:** FixedDegree uses **30 edges/node** for many flow paths.
+> Random uses **density=30** (30% of edges) for high max_flow values.
 
 ---
 
 ## Bipartite Graphs (10 graphs)
 
-| # | Source | Sink | Filename                    |
-|---|--------|------|-----------------------------|
-| 1 | 5      | 5    | 5s-5t-05p-1min-10max.txt    |
-| 2 | 10     | 10   | 10s-10t-05p-1min-10max.txt  |
-| 3 | 20     | 20   | 20s-20t-05p-1min-10max.txt  |
-| 4 | 30     | 30   | 30s-30t-05p-1min-10max.txt  |
-| 5 | 40     | 40   | 40s-40t-05p-1min-10max.txt  |
-| 6 | 50     | 50   | 50s-50t-05p-1min-10max.txt  |
-| 7 | 75     | 75   | 75s-75t-05p-1min-10max.txt  |
-| 8 | 100    | 100  | 100s-100t-05p-1min-10max.txt|
-| 9 | 125    | 125  | 125s-125t-05p-1min-10max.txt|
-| 10| 150    | 150  | 150s-150t-05p-1min-10max.txt|
+| # | Source | Sink | Vertices | Est. Edges | Filename                         |
+|---|--------|------|----------|------------|----------------------------------|
+| 1 | 50     | 50   | 102      | ~1,350     | 50s-50t-05p-1min-1000max.txt     |
+| 2 | 100    | 100  | 202      | ~5,200     | 100s-100t-05p-1min-1000max.txt   |
+| 3 | 200    | 200  | 402      | ~20,400    | 200s-200t-05p-1min-1000max.txt   |
+| 4 | 300    | 300  | 602      | ~45,000    | 300s-300t-05p-1min-1000max.txt   |
+| 5 | 400    | 400  | 802      | ~80,000    | 400s-400t-05p-1min-1000max.txt   |
+| 6 | 500    | 500  | 1,002    | ~125,000   | 500s-500t-05p-1min-1000max.txt   |
+| 7 | 600    | 600  | 1,202    | ~180,000   | 600s-600t-05p-1min-1000max.txt   |
+| 8 | 800    | 800  | 1,602    | ~320,000   | 800s-800t-05p-1min-1000max.txt   |
+| 9 | 1000   | 1000 | 2,002    | ~500,000   | 1000s-1000t-05p-1min-1000max.txt |
+| 10| 1200   | 1200 | 2,402    | ~720,000   | 1200s-1200t-05p-1min-1000max.txt |
 
 ---
 
 ## FixedDegree Graphs (10 graphs)
 
-| # | Vertices | Filename                   |
-|---|----------|----------------------------|
-| 1 | 15       | 15v-5out-1min-10max.txt    |
-| 2 | 25       | 25v-5out-1min-10max.txt    |
-| 3 | 50       | 50v-5out-1min-10max.txt    |
-| 4 | 100      | 100v-5out-1min-10max.txt   |
-| 5 | 150      | 150v-5out-1min-10max.txt   |
-| 6 | 200      | 200v-5out-1min-10max.txt   |
-| 7 | 300      | 300v-5out-1min-10max.txt   |
-| 8 | 400      | 400v-5out-1min-10max.txt   |
-| 9 | 500      | 500v-5out-1min-10max.txt   |
-| 10| 750      | 750v-5out-1min-10max.txt   |
+| # | Vertices | Edges/Node | Est. Edges | Filename                      |
+|---|----------|------------|------------|-------------------------------|
+| 1 | 100      | 30         | ~3,000     | 100v-30out-1min-1000max.txt   |
+| 2 | 250      | 30         | ~7,500     | 250v-30out-1min-1000max.txt   |
+| 3 | 500      | 30         | ~15,000    | 500v-30out-1min-1000max.txt   |
+| 4 | 1000     | 30         | ~30,000    | 1000v-30out-1min-1000max.txt  |
+| 5 | 1500     | 30         | ~45,000    | 1500v-30out-1min-1000max.txt  |
+| 6 | 2000     | 30         | ~60,000    | 2000v-30out-1min-1000max.txt  |
+| 7 | 2500     | 30         | ~75,000    | 2500v-30out-1min-1000max.txt  |
+| 8 | 3000     | 30         | ~90,000    | 3000v-30out-1min-1000max.txt  |
+| 9 | 3500     | 30         | ~105,000   | 3500v-30out-1min-1000max.txt  |
+| 10| 4000     | 30         | ~120,000   | 4000v-30out-1min-1000max.txt  |
 
 ---
 
 ## Mesh Graphs (10 graphs)
 
-| # | Rows | Cols | Filename               |
-|---|------|------|------------------------|
-| 1 | 5    | 5    | 5r-5c-5cap-const.txt   |
-| 2 | 8    | 8    | 8r-8c-5cap-const.txt   |
-| 3 | 10   | 10   | 10r-10c-5cap-const.txt |
-| 4 | 15   | 15   | 15r-15c-5cap-const.txt |
-| 5 | 20   | 20   | 20r-20c-5cap-const.txt |
-| 6 | 25   | 25   | 25r-25c-5cap-const.txt |
-| 7 | 30   | 30   | 30r-30c-5cap-const.txt |
-| 8 | 35   | 35   | 35r-35c-5cap-const.txt |
-| 9 | 40   | 40   | 40r-40c-5cap-const.txt |
-| 10| 50   | 50   | 50r-50c-5cap-const.txt |
+| # | Rows | Cols | Vertices | Est. Edges | Filename                    |
+|---|------|------|----------|------------|-----------------------------|
+| 1 | 20   | 20   | 402      | ~1,140     | 20r-20c-1000cap-const.txt   |
+| 2 | 40   | 40   | 1,602    | ~4,680     | 40r-40c-1000cap-const.txt   |
+| 3 | 60   | 60   | 3,602    | ~10,620    | 60r-60c-1000cap-const.txt   |
+| 4 | 80   | 80   | 6,402    | ~19,040    | 80r-80c-1000cap-const.txt   |
+| 5 | 100  | 100  | 10,002   | ~29,700    | 100r-100c-1000cap-const.txt |
+| 6 | 125  | 125  | 15,627   | ~46,500    | 125r-125c-1000cap-const.txt |
+| 7 | 150  | 150  | 22,502   | ~67,050    | 150r-150c-1000cap-const.txt |
+| 8 | 200  | 200  | 40,002   | ~119,400   | 200r-200c-1000cap-const.txt |
+| 9 | 250  | 250  | 62,502   | ~186,750   | 250r-250c-1000cap-const.txt |
+| 10| 300  | 300  | 90,002   | ~269,100   | 300r-300c-1000cap-const.txt |
 
 ---
 
 ## Random Graphs (10 graphs)
 
-| # | Vertices | Filename                  |
-|---|----------|---------------------------|
-| 1 | 15       | 15v-30d-1min-10max.txt    |
-| 2 | 25       | 25v-30d-1min-10max.txt    |
-| 3 | 50       | 50v-30d-1min-10max.txt    |
-| 4 | 75       | 75v-30d-1min-10max.txt    |
-| 5 | 100      | 100v-30d-1min-10max.txt   |
-| 6 | 150      | 150v-30d-1min-10max.txt   |
-| 7 | 200      | 200v-30d-1min-10max.txt   |
-| 8 | 250      | 250v-30d-1min-10max.txt   |
-| 9 | 300      | 300v-30d-1min-10max.txt   |
-| 10| 400      | 400v-30d-1min-10max.txt   |
+| # | Vertices | Density | Est. Edges | Filename                     |
+|---|----------|---------|------------|------------------------------|
+| 1 | 100      | 30      | ~1,500     | 100v-30d-1min-1000max.txt    |
+| 2 | 200      | 30      | ~6,000     | 200v-30d-1min-1000max.txt    |
+| 3 | 400      | 30      | ~24,000    | 400v-30d-1min-1000max.txt    |
+| 4 | 600      | 30      | ~54,000    | 600v-30d-1min-1000max.txt    |
+| 5 | 800      | 30      | ~96,000    | 800v-30d-1min-1000max.txt    |
+| 6 | 1000     | 30      | ~150,000   | 1000v-30d-1min-1000max.txt   |
+| 7 | 1250     | 30      | ~234,000   | 1250v-30d-1min-1000max.txt   |
+| 8 | 1500     | 30      | ~337,500   | 1500v-30d-1min-1000max.txt   |
+| 9 | 1750     | 30      | ~459,000   | 1750v-30d-1min-1000max.txt   |
+| 10| 2000     | 30      | ~600,000   | 2000v-30d-1min-1000max.txt   |
 
 ---
 
@@ -108,17 +113,17 @@ The script will:
 ```text
 GeneratedGraphs/
 ├── Bipartite/
-│   ├── 5s-5t-05p-1min-10max.txt
-│   ├── 10s-10t-05p-1min-10max.txt
+│   ├── 50s-50t-05p-1min-1000max.txt
+│   ├── 100s-100t-05p-1min-1000max.txt
 │   └── ...
 ├── FixedDegree/
-│   ├── 15v-5out-1min-10max.txt
+│   ├── 100v-30out-1min-1000max.txt
 │   └── ...
 ├── Mesh/
-│   ├── 5r-5c-5cap-const.txt
+│   ├── 20r-20c-1000cap-const.txt
 │   └── ...
 └── Random/
-    ├── 15v-30d-1min-10max.txt
+    ├── 100v-30d-1min-1000max.txt
     └── ...
 ```
 

@@ -5,9 +5,14 @@
 n = num vertices
 m = num edges
 
-FF: O(nC), C = sum of capacities out of s
-SFF: O(n*log2(C))
-PFP: Generic O(n2m), Max Height Selection Variant: O(n^3)
+FF: O(mC), C = sum of capacities out of s
+Reference: Book theorem 7.5
+
+SFF: O(m^2*log2(C))
+Reference: Book theorem 7.20
+
+PFP: Generic O(n^2*m), Max Height Selection Variant: O(n^3)
+Refence: Book theorem 7.33
 
 ## Graph Generation
 
@@ -74,104 +79,114 @@ Our methodology follows a two-phase approach:
 
 | Graph Type   | Fixed Parameters                                    |
 |--------------|-----------------------------------------------------|
-| Bipartite    | probability=0.5, min_cap=1, max_cap=10              |
-| FixedDegree  | edges_per_node=5, min_cap=1, max_cap=10             |
-| Mesh         | capacity=5, **constant_capacity=true**              |
-| Random       | density=30, min_cap=1, max_cap=10                   |
+| Bipartite    | probability=0.5, min_cap=1, max_cap=1000            |
+| FixedDegree  | **edges_per_node=30**, min_cap=1, max_cap=1000      |
+| Mesh         | **capacity=1000**, constant_capacity=true           |
+| Random       | **density=30**, min_cap=1, max_cap=1000             |
+
+> **Note on capacities:** Using high capacities (1-1000) to increase max_flow values.
+> Ford-Fulkerson is O(V×E×max_flow), so high max_flow is essential for meaningful runtimes.
+>
+> **Note on FixedDegree:** Using **30 edges per node** to create many flow paths
+> from source to sink. With fewer edges, max_flow stays too low regardless of capacity.
+>
+> **Note on Random density:** Using **density=30** (30% of possible edges) for
+> strong connectivity and high max_flow values.
+>
+> **Target runtime:** ~5 minutes for largest Ford-Fulkerson runs.
 
 ### Bipartite Graphs (10 graphs)
 
 | Graph # | Source Nodes | Sink Nodes | Total Vertices | Est. Edges |
 |---------|--------------|------------|----------------|------------|
-| 1       | 5            | 5          | 12             | ~22        |
-| 2       | 10           | 10         | 22             | ~70        |
-| 3       | 20           | 20         | 42             | ~220       |
-| 4       | 30           | 30         | 62             | ~480       |
-| 5       | 40           | 40         | 82             | ~840       |
-| 6       | 50           | 50         | 102            | ~1,300     |
-| 7       | 75           | 75         | 152            | ~2,900     |
-| 8       | 100          | 100        | 202            | ~5,100     |
-| 9       | 125          | 125        | 252            | ~7,900     |
-| 10      | 150          | 150        | 302            | ~11,400    |
+| 1       | 50           | 50         | 102            | ~1,350     |
+| 2       | 100          | 100        | 202            | ~5,200     |
+| 3       | 200          | 200        | 402            | ~20,400    |
+| 4       | 300          | 300        | 602            | ~45,000    |
+| 5       | 400          | 400        | 802            | ~80,000    |
+| 6       | 500          | 500        | 1,002          | ~125,000   |
+| 7       | 600          | 600        | 1,202          | ~180,000   |
+| 8       | 800          | 800        | 1,602          | ~320,000   |
+| 9       | 1000         | 1000       | 2,002          | ~500,000   |
+| 10      | 1200         | 1200       | 2,402          | ~720,000   |
 
-File naming: `{src}s-{sink}t-05p-1min-10max.txt`
-Example: `10s-10t-05p-1min-10max.txt`
+File naming: `{src}s-{sink}t-05p-1min-1000max.txt`
+Example: `1000s-1000t-05p-1min-1000max.txt`
 
 ### FixedDegree Graphs (10 graphs)
 
 | Graph # | Vertices | Edges/Node | Total Edges |
 |---------|----------|------------|-------------|
-| 1       | 15       | 5          | ~95         |
-| 2       | 25       | 5          | ~145        |
-| 3       | 50       | 5          | ~270        |
-| 4       | 100      | 5          | ~520        |
-| 5       | 150      | 5          | ~770        |
-| 6       | 200      | 5          | ~1,020      |
-| 7       | 300      | 5          | ~1,520      |
-| 8       | 400      | 5          | ~2,020      |
-| 9       | 500      | 5          | ~2,520      |
-| 10      | 750      | 5          | ~3,770      |
+| 1       | 100      | 30         | ~3,000      |
+| 2       | 250      | 30         | ~7,500      |
+| 3       | 500      | 30         | ~15,000     |
+| 4       | 1000     | 30         | ~30,000     |
+| 5       | 1500     | 30         | ~45,000     |
+| 6       | 2000     | 30         | ~60,000     |
+| 7       | 2500     | 30         | ~75,000     |
+| 8       | 3000     | 30         | ~90,000     |
+| 9       | 3500     | 30         | ~105,000    |
+| 10      | 4000     | 30         | ~120,000    |
 
-File naming: `{v}v-5out-1min-10max.txt`
-Example: `100v-5out-1min-10max.txt`
+File naming: `{v}v-30out-1min-1000max.txt`
+Example: `1000v-30out-1min-1000max.txt`
 
 ### Mesh Graphs (10 graphs)
 
 | Graph # | Rows | Cols | Total Vertices | Est. Edges |
 |---------|------|------|----------------|------------|
-| 1       | 5    | 5    | 27             | ~60        |
-| 2       | 8    | 8    | 66             | ~170       |
-| 3       | 10   | 10   | 102            | ~270       |
-| 4       | 15   | 15   | 227            | ~630       |
-| 5       | 20   | 20   | 402            | ~1,140     |
-| 6       | 25   | 25   | 627            | ~1,800     |
-| 7       | 30   | 30   | 902            | ~2,610     |
-| 8       | 35   | 35   | 1,227          | ~3,570     |
-| 9       | 40   | 40   | 1,602          | ~4,680     |
-| 10      | 50   | 50   | 2,502          | ~7,350     |
+| 1       | 20   | 20   | 402            | ~1,140     |
+| 2       | 40   | 40   | 1,602          | ~4,680     |
+| 3       | 60   | 60   | 3,602          | ~10,620    |
+| 4       | 80   | 80   | 6,402          | ~19,040    |
+| 5       | 100  | 100  | 10,002         | ~29,700    |
+| 6       | 125  | 125  | 15,627         | ~46,500    |
+| 7       | 150  | 150  | 22,502         | ~67,050    |
+| 8       | 200  | 200  | 40,002         | ~119,400   |
+| 9       | 250  | 250  | 62,502         | ~186,750   |
+| 10      | 300  | 300  | 90,002         | ~269,100   |
 
-File naming: `{r}r-{c}c-5cap-const.txt`
-Example: `10r-10c-5cap-const.txt`
+File naming: `{r}r-{c}c-1000cap-const.txt`
+Example: `100r-100c-1000cap-const.txt`
 
 ### Random Graphs (10 graphs)
 
-| Graph # | Vertices | Density | Est. Edges |
-|---------|----------|---------|------------|
-| 1       | 15       | 30      | ~35        |
-| 2       | 25       | 30      | ~95        |
-| 3       | 50       | 30      | ~370       |
-| 4       | 75       | 30      | ~840       |
-| 5       | 100      | 30      | ~1,500     |
-| 6       | 150      | 30      | ~3,400     |
-| 7       | 200      | 30      | ~6,000     |
-| 8       | 250      | 30      | ~9,400     |
-| 9       | 300      | 30      | ~13,500    |
-| 10      | 400      | 30      | ~24,000    |
+| Graph # | Vertices | Density | Est. Edges  |
+|---------|----------|---------|-------------|
+| 1       | 100      | 30      | ~1,500      |
+| 2       | 200      | 30      | ~6,000      |
+| 3       | 400      | 30      | ~24,000     |
+| 4       | 600      | 30      | ~54,000     |
+| 5       | 800      | 30      | ~96,000     |
+| 6       | 1000     | 30      | ~150,000    |
+| 7       | 1250     | 30      | ~234,000    |
+| 8       | 1500     | 30      | ~337,500    |
+| 9       | 1750     | 30      | ~459,000    |
+| 10      | 2000     | 30      | ~600,000    |
 
-File naming: `{v}v-30d-1min-10max.txt`
-Example: `100v-30d-1min-10max.txt`
+File naming: `{v}v-30d-1min-1000max.txt`
+Example: `1000v-30d-1min-1000max.txt`
 
 ---
 
 ## Summary Statistics
 
-| Graph Type   | Graphs | Vertex Range | Edge Range      |
-|--------------|--------|--------------|-----------------|
-| Bipartite    | 10     | 12 - 302     | ~22 - ~11,400   |
-| FixedDegree  | 10     | 15 - 750     | ~95 - ~3,770    |
-| Mesh         | 10     | 27 - 2,502   | ~60 - ~7,350    |
-| Random       | 10     | 15 - 400     | ~35 - ~24,000   |
-| **Total**    | **40** |              |                 |
+| Graph Type   | Graphs | Vertex Range    | Edge Range           |
+|--------------|--------|-----------------|----------------------|
+| Bipartite    | 10     | 102 - 2,402     | ~1,350 - ~720,000    |
+| FixedDegree  | 10     | 100 - 4,000     | ~3,000 - ~120,000    |
+| Mesh         | 10     | 402 - 90,002    | ~1,140 - ~269,100    |
+| Random       | 10     | 100 - 2,000     | ~1,500 - ~600,000    |
+| **Total**    | **40** |                 |                      |
 
 ## Estimated Benchmark Runtime
 
 - **Total graphs:** 40 (10 per type × 4 types)
 - **Runs per graph:** 10 runs × 3 algorithms = 30 executions per graph
-- **Small graphs (vertices < 200):** ~0.1s per run → negligible
-- **Medium graphs (200-500 vertices):** ~0.5-2s per run
-- **Largest graphs:** ~5-20s per run (worst case)
+- **Small/medium graphs:** Most under 1 minute per graph
+- **Largest graphs:** Estimated 5-30 minutes per graph
 
-**Conservative estimate:** 2-3 hours total benchmark time
+**Target total runtime:** ~1-2 hours (may vary by machine and algorithm)
 
 ---
 
