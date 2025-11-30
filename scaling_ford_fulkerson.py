@@ -1,13 +1,14 @@
 from graph import Graph
 import math
 
+
 def scaling_max_flow(graph, source, sink):
-    
+
     # Find the max_capacity in the edges outgoing from source
     max_capacity = 0
     for v, cap_str in graph.graph.get(source, {}).items():
         max_capacity = max(max_capacity, int(cap_str))
-    
+
     # If there is no outgoing edge from source, return 0
     if max_capacity == 0:
         return 0
@@ -22,14 +23,14 @@ def scaling_max_flow(graph, source, sink):
     # Initialize flow f = 0
     parent = {}
     max_flow = 0
-    
+
     # Outer loop: While Delta >= 1
     while delta >= 1:
-        
+
         # Inner loop: While there is an s-t path in the graph G_f(Delta)
         # Here we call the delta_BFS to find a s-t path with capacity >= Delta
-        while graph.delta_BFS(source, sink, parent, delta):
-            
+        while graph.BFS(source, sink, parent, delta):
+
             # 1. Find the bottleneck capacity (path_flow) on path P
             path_flow = float("Inf")
             s = sink
@@ -40,7 +41,7 @@ def scaling_max_flow(graph, source, sink):
                 s = parent[s]
 
             max_flow += path_flow  # increase overall flow by the bottleneck value
-            
+
             # 2. Update residual graph
             v = sink
             while v != source:
@@ -60,12 +61,13 @@ def scaling_max_flow(graph, source, sink):
                 # Set capacity of the backward edge to the bottleneck value because we have pushed that much flow through the forward edge
                 graph.graph[v][u] = str(int(graph.graph[v][u]) + path_flow)
                 v = parent[v]
-        
+
         # Outer loop ends, reduce Delta: Delta = Delta / 2
         delta //= 2
-        
+
     # Return f (max_flow)
     return max_flow
+
 
 if __name__ == "__main__":
     bipartite_g1 = Graph("./graphs/Bipartite/g1.txt")
@@ -83,8 +85,12 @@ if __name__ == "__main__":
     fixedDegree_g2 = Graph("./graphs/FixedDegree/100v-5out-25min-200max.txt")
 
     print("Fixed Degree graphs:")
-    print("g1: The maximum possible flow is:", scaling_max_flow(fixedDegree_g1, "s", "t"))
-    print("g2: The maximum possible flow is:", scaling_max_flow(fixedDegree_g2, "s", "t"))
+    print(
+        "g1: The maximum possible flow is:", scaling_max_flow(fixedDegree_g1, "s", "t")
+    )
+    print(
+        "g2: The maximum possible flow is:", scaling_max_flow(fixedDegree_g2, "s", "t")
+    )
 
     #################################################
 
@@ -103,5 +109,11 @@ if __name__ == "__main__":
 
     print("")
     print("Random graphs:")
-    print("(scaling_max_flow) g1: The maximum possible flow is:", scaling_max_flow(random_g1, "s", "t"))
-    print("(scaling_max_flow) g2: The maximum possible flow is:", scaling_max_flow(random_g2, "s", "t"))
+    print(
+        "(scaling_max_flow) g1: The maximum possible flow is:",
+        scaling_max_flow(random_g1, "s", "t"),
+    )
+    print(
+        "(scaling_max_flow) g2: The maximum possible flow is:",
+        scaling_max_flow(random_g2, "s", "t"),
+    )

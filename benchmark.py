@@ -45,7 +45,9 @@ def detect_python_command():
     return "python3"
 
 
-def run_max_flow(graph_path, source, sink, mad_flow_script, python_cmd="python3"):
+def run_max_flow(
+    graph_path, source, sink, algorithm, mad_flow_script, python_cmd="python3"
+):
     """Run mad-flow.py on a graph and measure execution time."""
     start_time = time.perf_counter()
 
@@ -60,6 +62,8 @@ def run_max_flow(graph_path, source, sink, mad_flow_script, python_cmd="python3"
                 source,
                 "-t",
                 sink,
+                "-a",
+                algorithm,
                 "--json",
             ],
             capture_output=True,
@@ -155,6 +159,7 @@ def process_single_graph(args_tuple):
         num_runs,
         source,
         sink,
+        algorithm,
         mad_flow_script,
         python_cmd,
     ) = args_tuple
@@ -182,7 +187,7 @@ def process_single_graph(args_tuple):
 
     for run in range(num_runs):
         elapsed, flow, error = run_max_flow(
-            str(graph_file), source, sink, mad_flow_script, python_cmd
+            str(graph_file), source, sink, algorithm, mad_flow_script, python_cmd
         )
 
         if error:
@@ -318,6 +323,7 @@ def benchmark_graphs(
                     num_runs,
                     source,
                     sink,
+                    algorithm,
                     mad_flow_script,
                     python_cmd,
                 )
@@ -473,9 +479,8 @@ def main():
         "-a",
         "--algorithm",
         type=str,
-        choices=["ford_fulkerson", "scaling_ford_fulkerson", "preflow_push"],
-        default="ford_fulkerson",
-        help="Algorithm to benchmark (default: ford_fulkerson)",
+        default=None,
+        help='Algorithm(s) to benchmark: comma-separated list (e.g., "ford_fulkerson,scaling_ford_fulkerson") or single algorithm. If not specified, benchmarks all implemented algorithms.',
     )
 
     parser.add_argument(
@@ -528,12 +533,34 @@ def main():
     python_cmd = detect_python_command()
     print(f"Using Python command: {python_cmd}")
 
-    # Validate algorithm implementation
-    if args.algorithm != "ford_fulkerson":
-        print(f"WARNING: Algorithm '{args.algorithm}' not yet implemented.")
-        print("Currently only 'ford_fulkerson' is supported.")
-        print("Proceeding with ford_fulkerson...")
-        args.algorithm = "ford_fulkerson"
+    # Determine which algorithms to benchmark
+    valid_algorithms = ["ford_fulkerson", "scaling_ford_fulkerson", "preflow_push"]
+    implemented_algorithms = ["ford_fulkerson", "scaling_ford_fulkerson"]
+
+    if args.algorithm:
+        # Parse comma-separated list
+        algorithms = [alg.strip() for alg in args.algorithm.split(",")]
+
+        # Validate algorithms
+        invalid_algorithms = [alg for alg in algorithms if alg not in valid_algorithms]
+        if invalid_algorithms:
+            print(f"Error: Invalid algorithm(s): {', '.join(invalid_algorithms)}")
+            print(f"Valid algorithms: {', '.join(valid_algorithms)}")
+            return 1
+
+        # Check for preflow_push (not yet implemented)
+        if "preflow_push" in algorithms:
+            print("Error: 'preflow_push' algorithm is not yet implemented")
+            print(f"Available algorithms: {', '.join(implemented_algorithms)}")
+            return 1
+    else:
+        # Auto-detect: use all implemented algorithms
+        algorithms = implemented_algorithms
+        print(f"Auto-detected algorithms: {', '.join(algorithms)}")
+
+    # Auto-detect script if not specified (defaults to mad-flow.py)
+    if args.mad_flow_script is None:
+        args.mad_flow_script = "mad-flow.py"
 
     # Validate paths
     if not os.path.exists(args.input):
@@ -541,7 +568,7 @@ def main():
         return 1
 
     if not os.path.exists(args.mad_flow_script):
-        print(f"Error: Script '{args.mad_flow_script}' does not exist")
+        print(f"Error: Max flow script '{args.mad_flow_script}' not found")
         return 1
 
     # Validate processes
@@ -565,32 +592,52 @@ def main():
     print(f"Benchmark Configuration:")
     print(f"  Input directory: {args.input}")
     print(f"  Output directory: {args.output}")
-    print(f"  Algorithm: {args.algorithm}")
+    print(f"  Algorithm(s): {', '.join(algorithms)}")
+    print(f"  Algorithm script: {args.mad_flow_script}")
     print(f"  Graph types: {args.types if args.types else 'all'}")
     print(f"  Runs per graph: {args.runs}")
     print(f"  Parallel processes: {args.processes}")
     print(f"  Source node: {args.source}")
     print(f"  Sink node: {args.sink}")
 
-    # Run benchmark
-    success = benchmark_graphs(
-        args.input,
-        args.output,
-        args.algorithm,
-        args.types,
-        args.runs,
-        args.source,
-        args.sink,
-        args.mad_flow_script,
-        args.processes,
-        python_cmd,
-    )
+    # Run benchmarks for each algorithm
+    all_success = True
+    for i, algorithm in enumerate(algorithms):
+        if len(algorithms) > 1:
+            print(f"\n{'='*60}")
+            print(f"Benchmarking algorithm {i+1}/{len(algorithms)}: {algorithm}")
+            print(f"{'='*60}")
 
-    if not success:
-        print("\nBenchmark FAILED - no results were saved")
+        success = benchmark_graphs(
+            args.input,
+            args.output,
+            algorithm,
+            args.types,
+            args.runs,
+            args.source,
+            args.sink,
+            args.mad_flow_script,
+            args.processes,
+            python_cmd,
+        )
+
+        if not success:
+            print(f"\n✗ Benchmark FAILED for algorithm: {algorithm}")
+            all_success = False
+        elif len(algorithms) > 1:
+            print(f"\n✓ Completed benchmark for: {algorithm}")
+
+    if not all_success:
+        print("\n✗ Some benchmarks FAILED")
         return 1
 
-    print("\n✓ Benchmark complete!")
+    if len(algorithms) > 1:
+        print(f"\n{'='*60}")
+        print(f"✓ All benchmarks complete! ({len(algorithms)} algorithms)")
+        print(f"{'='*60}")
+    else:
+        print("\n✓ Benchmark complete!")
+
     return 0
 
 
