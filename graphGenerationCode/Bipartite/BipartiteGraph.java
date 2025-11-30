@@ -8,30 +8,49 @@ public class BipartiteGraph
 	{
 		int n, m, maxCapacity, i, j, minCapacity;
 		double maxProbability, value, x;
-		System.out.println("\n\n---------------------------------------------------");
-		System.out.print("Enter number of nodes on the source side: \t");
-		n = GetInt();
-		System.out.print("Enter number of nodes on the sink side: \t");
-		m = GetInt();
-		System.out.print("Enter max probability: \t\t\t\t");
-		maxProbability = GetReal();
+		String fileName;
+
+		if(args.length == 6) {
+			// Command-line mode: source_nodes sink_nodes probability min_cap max_cap output_file
+			n = Integer.parseInt(args[0]);
+			m = Integer.parseInt(args[1]);
+			maxProbability = Double.parseDouble(args[2]);
+			minCapacity = Integer.parseInt(args[3]);
+			maxCapacity = Integer.parseInt(args[4]);
+			fileName = args[5];
+		} else {
+			// Interactive mode
+			System.out.println("\n\n---------------------------------------------------");
+			System.out.print("Enter number of nodes on the source side: \t");
+			n = GetInt();
+			System.out.print("Enter number of nodes on the sink side: \t");
+			m = GetInt();
+			System.out.print("Enter max probability: \t\t\t\t");
+			maxProbability = GetReal();
+			if(maxProbability > 1)
+			{
+				System.out.println("Max probability should be less than or equal to 1");
+				return;
+			}
+			System.out.print("Enter minimum capacity: \t\t\t");
+			minCapacity = GetInt();
+			System.out.print("Enter maximum capacity: \t\t\t");
+			maxCapacity = GetInt();
+			String directory = System.getProperty("user.dir");
+			System.out.print("Enter the output file name (without .txt): \t\t\t");
+			fileName = directory + File.separator + GetString() + ".txt";
+			System.out.println("---------------------------------------------------\n");
+		}
+
 		if(maxProbability > 1)
 		{
 			System.out.println("Max probability should be less than or equal to 1");
 			return;
 		}
-		System.out.print("Enter minimum capacity: \t\t\t");
-		minCapacity = GetInt();
-		System.out.print("Enter maximum capacity: \t\t\t");
-		maxCapacity = GetInt();
-		String directory = System.getProperty("user.dir");
-		System.out.print("Enter the output file name: \t\t\t");
-		String fileName = GetString() + ".txt";	
-		System.out.println("---------------------------------------------------\n");
 
 		try
 		{
-			PrintWriter outFile = new  PrintWriter(new FileWriter(new File(directory, fileName)));
+			PrintWriter outFile = new PrintWriter(new FileWriter(fileName));
 
 			double[][] edge = new double[n][m];
 			for(i=0; i<n; i++)
@@ -45,10 +64,10 @@ public class BipartiteGraph
 						edge[i][j] = 0;
 				}
 			}
-			
+
 			System.out.println("-----------------------------------------");
 			System.out.println("\tSource\tSink\tCapacity");
-			System.out.println("-----------------------------------------");			
+			System.out.println("-----------------------------------------");
 
 			//computing the edges out of source
 			for (i = 0; i < n; i++)
@@ -62,7 +81,7 @@ public class BipartiteGraph
 			for(i=0; i<n; i++)
 			{
 				for(j=0; j<m; j++)
-				{				
+				{
 					if(edge[i][j] > 0)
 					{
 						edge[i][j] = Math.floor(minCapacity + (edge[i][j] * (maxCapacity - minCapacity + 1)));
@@ -81,7 +100,7 @@ public class BipartiteGraph
 				outFile.println("\tr" + (j + 1) + "\t" + "t" + "\t" + (int)value);
 			}
 
-			System.out.println("\n\nOutput is created at: \t" + directory + "\\" + fileName);
+			System.out.println("\n\nOutput is created at: \t" + fileName);
 			outFile.close();
 		}
 		catch(Exception ex)
@@ -91,20 +110,20 @@ public class BipartiteGraph
 	}
 
 	//helper functions
-	public static String GetString() throws IOException 
+	public static String GetString() throws IOException
 	{
 		BufferedReader stringIn = new BufferedReader (new
 			InputStreamReader(System.in));
 		return  stringIn.readLine();
 	}
 
-	public static int GetInt() throws IOException 
+	public static int GetInt() throws IOException
 	{
 		String aux = GetString();
 		return Integer.parseInt(aux);
 	}
 
-	public static double GetReal() throws IOException 
+	public static double GetReal() throws IOException
 	{
 		String  aux = GetString();
 		Double d  = new Double(aux);

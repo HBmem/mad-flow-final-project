@@ -8,25 +8,122 @@ public class BuildGraph
 		String fileName, directory;
 		int vertices, dense, maxCapacity, minCapacity;
 
-		System.out.println("\n\n---------------------------------------------------");
-		System.out.print("Enter directory (or press Enter for current): \t");
-		directory = GetString();
-		System.out.print("Enter number of vertices: \t\t\t");
-		vertices = GetInt();
-		System.out.print("Enter density (0-100): \t\t\t\t");
-		dense = GetInt();
-		System.out.print("Enter minimum capacity: \t\t\t");
-		minCapacity = GetInt();
-		System.out.print("Enter maximum capacity: \t\t\t");
-		maxCapacity = GetInt();
-		System.out.print("Enter output file name (without .txt): \t");
-		fileName = GetString() + ".txt";
-		System.out.println("---------------------------------------------------\n");
-
-		BuildGraph(fileName, directory, vertices, dense, maxCapacity, minCapacity);
+		if(args.length == 5) {
+			// Command-line mode: vertices density min_cap max_cap output_file
+			vertices = Integer.parseInt(args[0]);
+			dense = Integer.parseInt(args[1]);
+			minCapacity = Integer.parseInt(args[2]);
+			maxCapacity = Integer.parseInt(args[3]);
+			fileName = args[4];
+			directory = "";  // Not used in command-line mode
+			BuildGraphToFile(fileName, vertices, dense, maxCapacity, minCapacity);
+		} else {
+			// Interactive mode
+			System.out.println("\n\n---------------------------------------------------");
+			System.out.print("Enter directory (or press Enter for current): \t");
+			directory = GetString();
+			System.out.print("Enter number of vertices: \t\t\t");
+			vertices = GetInt();
+			System.out.print("Enter density (0-100): \t\t\t\t");
+			dense = GetInt();
+			System.out.print("Enter minimum capacity: \t\t\t");
+			minCapacity = GetInt();
+			System.out.print("Enter maximum capacity: \t\t\t");
+			maxCapacity = GetInt();
+			System.out.print("Enter output file name (without .txt): \t");
+			fileName = GetString() + ".txt";
+			System.out.println("---------------------------------------------------\n");
+			BuildGraphWithDir(fileName, directory, vertices, dense, maxCapacity, minCapacity);
+		}
 	}
 
-	private static void BuildGraph(String fileName, String directory, int vertices, int dense, int maxCapacity, int minCapacity)
+	private static void BuildGraphToFile(String filePath, int vertices, int dense, int maxCapacity, int minCapacity)
+	{
+		Random random = new Random();
+		try{
+			File outputfile = new File(filePath);
+			int[][] Graph = new int[vertices][vertices];
+			int n, m;
+
+			for (n = 0; n < vertices; n++)
+				for (m = n+1; m < vertices; m++)
+				{
+					int randomInt = (random.nextInt((maxCapacity-minCapacity+1))+minCapacity);
+
+					int k = (int) (1000.0*Math.random()/10.0);
+					int b = (k < dense) ? 1 : 0;
+					if(b == 0)
+					{
+						Graph[n][m] = Graph[m][n] = b;
+					}
+					else
+					{
+						Graph[n][m] = Graph[m][n] = randomInt;
+					}
+				}
+
+			PrintWriter output = new PrintWriter(new FileWriter(outputfile));
+
+			for(int x = 0; x < Graph.length; x++)
+			{
+				if(x == 0)
+				{
+					for(int y = 0; y < Graph[x].length; y++)
+					{
+						String value = String.valueOf(Graph[x][y]);
+						if(y != 0)
+						{
+							if(value.equals("0") == false)
+							{
+								output.print("s " + String.valueOf(y) + " " + value + "\n");
+							}
+						}
+					}
+				}
+				else
+				{
+					if(x == Graph.length-1)
+					{
+						for(int y = 0; y < Graph[x].length; y++)
+						{
+							String value = String.valueOf(Graph[x][y]);
+							if(y != 0)
+							{
+								if(value.equals("0") == false)
+								{
+									output.print(String.valueOf(y) + " t " + value + "\n");
+								}
+							}
+						}
+					}
+					else
+					{
+						for(int y = 0; y < Graph[x].length; y++)
+						{
+							String value = String.valueOf(Graph[x][y]);
+							if(y != 0)
+							{
+								if(value.equals("0") == false)
+								{
+									output.print(x + " " + String.valueOf(y) + " " + value + "\n");
+								}
+							}
+						}
+					}
+				}
+			}
+
+			output.close();
+		}
+		catch (IOException e)
+		{
+			System.err.println("Error opening file: " + e);
+			return;
+		}
+		System.out.print("\nDone\n");
+	}
+
+	private static void BuildGraphWithDir(String fileName, String directory, int vertices, int dense, int maxCapacity, int minCapacity)
 	{
 		Random random = new Random();
 		try{
