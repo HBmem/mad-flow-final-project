@@ -1,50 +1,50 @@
 from collections import defaultdict, deque
 
 def preflow_push_max_flow(capacity, source, sink):
-    # Collect all vertices that appear anywhere in the graph
+    # Collect all vertices that appear in the capacity graph
     vertices = set(capacity.keys())
     for u in capacity:
         for v in capacity[u]:
             vertices.add(v)
     vertices = list(vertices)
 
-    # For each vertex, keep track of neighbors for residual edges
+    # Track neighbors so we can check residual edges easily
     neighbors = {u: set() for u in vertices}
     for u in capacity:
         for v in capacity[u]:
             neighbors[u].add(v)
             neighbors[v].add(u)
 
-    # Flow starts at 0 on every edge
+    # Start with zero flow everywhere
     flow = defaultdict(lambda: defaultdict(int))
 
-    # Height and excess for each vertex
+    # Height and excess are the main values used by Preflow-Push
     height = {u: 0 for u in vertices}
     excess = {u: 0 for u in vertices}
 
-    # Source starts "above" everyone else
+    # Standard initialization: source starts with a large height
     height[source] = len(vertices)
 
+    # Residual capacity helper
     def residual(u, v):
-        # Residual capacity = original capacity - current flow
         cap = capacity.get(u, {}).get(v, 0)
         return cap - flow[u][v]
 
-    # Push all possible flow out of the source once (initial preflow)
+    # Initial push: send as much as possible out of the source
     for v, c in capacity.get(source, {}).items():
         flow[source][v] = c
         flow[v][source] = -c
         excess[v] += c
         excess[source] -= c
 
-    # Active = vertices (except s, t) that currently have extra flow
+    # Active nodes = nodes with extra flow (except s and t)
     active = deque(
         u for u in vertices
         if u not in (source, sink) and excess[u] > 0
     )
 
     def push(u, v):
-        # Send as much as we can from u to v
+        # Push whatever u can send through (u, v)
         send = min(excess[u], residual(u, v))
         if send <= 0:
             return
@@ -53,12 +53,13 @@ def preflow_push_max_flow(capacity, source, sink):
         flow[v][u] -= send
         excess[u] -= send
         excess[v] += send
-        # If v just became active (and is not s or t), add it to the queue
+
+        # If v becomes active for the first time, add it to the queue
         if v not in (source, sink) and prev_excess_v == 0 and excess[v] > 0:
             active.append(v)
 
     def relabel(u):
-        # Raise u just enough to make at least one outgoing edge admissible
+        # Increase u's height so it can push somewhere
         min_height = None
         for v in neighbors[u]:
             if residual(u, v) > 0:
@@ -68,7 +69,7 @@ def preflow_push_max_flow(capacity, source, sink):
             height[u] = min_height + 1
 
     def discharge(u):
-        # Keep pushing from u until it has no extra flow left
+        # Keep trying to push flow out of u until it has no excess left
         while excess[u] > 0:
             pushed = False
             for v in neighbors[u]:
@@ -78,30 +79,30 @@ def preflow_push_max_flow(capacity, source, sink):
                     if excess[u] == 0:
                         break
             if not pushed:
-                # No admissible edge right now, so increase u's height
+                # No valid push edges, so lift u
                 relabel(u)
 
-    # Main loop: process active vertices until none are left
+    # Main algorithm loop: process active nodes one at a time
     while active:
         u = active.popleft()
         discharge(u)
-        # If u is still active after discharge, put it back into the queue
+
+        # If the node still has extra flow, it stays active
         if excess[u] > 0:
             active.append(u)
 
-    # At the end, the excess at the sink is the max flow value
+    # Max flow sits in the sink's excess after all pushes finish
     return excess[sink]
 
 
 def preflow_push(graph, source, sink):
-    # Build a clean capacity dictionary from our Graph object:
-    # convert string weights to ints and skip zero-capacity edges.
+    # Build a simple capacity dict from the Graph object
     capacity = {}
     for u in graph.graph:
         capacity[u] = {}
         for v, w in graph.graph[u].items():
             c = int(w)
-            if c > 0:
+            if c > 0:  # Only keep usable edges
                 capacity[u][v] = c
 
     return preflow_push_max_flow(capacity, source, sink)
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     # Small sanity check graph:
     # s -> a (10), s -> b (5)
     # a -> t (5),  b -> t (10)
-    # Max flow here is 10.
+    # Correct max flow here is 10.
     capacity = {
         "s": {"a": 10, "b": 5},
         "a": {"t": 5},
