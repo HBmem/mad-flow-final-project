@@ -23,6 +23,19 @@ def read_results(results_dir, algorithm, graph_type):
     return data.get("results", [])
 
 
+ALGORITHM_COLORS = {
+    "ford_fulkerson": "#e74c3c",  # Red
+    "scaling_ford_fulkerson": "#3498db",  # Blue
+    "preflow_push": "#2ecc71",  # Green
+}
+
+ALGORITHM_LABELS = {
+    "ford_fulkerson": "Ford-Fulkerson",
+    "scaling_ford_fulkerson": "Scaling FF",
+    "preflow_push": "Preflow-Push",
+}
+
+
 def plot_bar_chart(
     x_values,
     y_values,
@@ -229,6 +242,174 @@ def generate_plots_for_graph_type(results_dir, plots_dir, algorithm, graph_type)
     return 2  # Number of plots generated (mean and max)
 
 
+def plot_comparison_line_chart(
+    x_labels,
+    algorithm_data,
+    title,
+    xlabel,
+    ylabel,
+    output_path,
+):
+    """Create a line chart comparing multiple algorithms."""
+    fig, ax = plt.subplots(figsize=(14, 7))
+
+    algorithms = list(algorithm_data.keys())
+    indices = range(len(x_labels))
+
+    # Create lines for each algorithm
+    for i, algorithm in enumerate(algorithms):
+        values = algorithm_data[algorithm]
+        color = ALGORITHM_COLORS.get(algorithm, f"C{i}")
+        label = ALGORITHM_LABELS.get(algorithm, algorithm.replace("_", " ").title())
+
+        # Plot line with markers
+        ax.plot(
+            indices,
+            values,
+            label=label,
+            color=color,
+            linewidth=2.5,
+            marker="o",
+            markersize=8,
+            markerfacecolor="white",
+            markeredgewidth=2,
+            markeredgecolor=color,
+        )
+
+    # Set labels and title
+    ax.set_xlabel(xlabel, fontsize=12, fontweight="bold")
+    ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
+    ax.set_title(title, fontsize=14, fontweight="bold")
+
+    # Set x-axis ticks
+    ax.set_xticks(indices)
+    ax.set_xticklabels(x_labels, rotation=45, ha="right", fontsize=9)
+
+    # Add grid and legend
+    ax.grid(axis="both", alpha=0.3, linestyle="--")
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", fontsize=10)
+
+    # Use log scale if values span multiple orders of magnitude
+    all_values = [v for vals in algorithm_data.values() for v in vals if v > 0]
+    if all_values and max(all_values) / (min(all_values) + 1e-10) > 100:
+        ax.set_yscale("log")
+        ax.set_ylabel(ylabel + " (log scale)", fontsize=12, fontweight="bold")
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    print(f"  Saved: {output_path}")
+
+
+def generate_comparison_plots(results_dir, plots_dir, graph_types=None):
+    """Generate comparison plots showing all algorithms side by side for each graph type."""
+    results_path = Path(results_dir)
+    comparison_dir = Path(plots_dir) / "Comparisons"
+
+    # Find all available algorithms
+    available_algorithms = [d.name for d in results_path.iterdir() if d.is_dir()]
+    if not available_algorithms:
+        print("  No algorithms found for comparison")
+        return False
+
+    print(f"  Comparing algorithms: {', '.join(available_algorithms)}")
+
+    # Determine graph types to process
+    if graph_types:
+        requested_types = [t.lower().strip() for t in graph_types.split(",")]
+    else:
+        # Find all graph types across all algorithms
+        all_types = set()
+        for algo in available_algorithms:
+            algo_dir = results_path / algo
+            for d in algo_dir.iterdir():
+                if d.is_dir():
+                    all_types.add(d.name)
+        requested_types = sorted(all_types)
+
+    if not requested_types:
+        print("  No graph types found for comparison")
+        return False
+
+    total_plots = 0
+
+    for graph_type in requested_types:
+        print(f"  Generating comparison for {graph_type}...")
+
+        # Collect data from each algorithm
+        all_data = {}
+        for algorithm in available_algorithms:
+            results = read_results(results_dir, algorithm, graph_type)
+            if results:
+                all_data[algorithm] = sorted(
+                    results, key=lambda x: (x["num_vertices"], x["num_edges"])
+                )
+
+        if len(all_data) < 2:
+            print(f"    Skipping {graph_type}: need at least 2 algorithms with data")
+            continue
+
+        # Find common graph sizes across all algorithms (by vertices × edges)
+        size_sets = []
+        for algorithm, results in all_data.items():
+            sizes = {(r["num_vertices"], r["num_edges"]) for r in results}
+            size_sets.append(sizes)
+
+        common_sizes = sorted(set.intersection(*size_sets))
+        if not common_sizes:
+            print(f"    Skipping {graph_type}: no common graph sizes found")
+            continue
+
+        # Create output directory
+        output_dir = comparison_dir / graph_type
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Build data structures for plotting
+        x_labels = [f"n={v}\nm={e}" for v, e in common_sizes]
+
+        # Mean times comparison
+        mean_data = {}
+        max_data = {}
+        for algorithm, results in all_data.items():
+            size_to_result = {
+                (r["num_vertices"], r["num_edges"]): r for r in results
+            }
+            mean_data[algorithm] = [
+                size_to_result[size]["statistics"]["mean"] for size in common_sizes
+            ]
+            max_data[algorithm] = [
+                size_to_result[size]["statistics"]["max"] for size in common_sizes
+            ]
+
+        # Generate mean comparison plot
+        plot_comparison_line_chart(
+            x_labels=x_labels,
+            algorithm_data=mean_data,
+            title=f"Algorithm Comparison - {graph_type.capitalize()} - Mean Runtime",
+            xlabel="Graph Size (n=vertices, m=edges)",
+            ylabel="Mean Runtime (seconds)",
+            output_path=output_dir / "mean_runtime_comparison.png",
+        )
+        total_plots += 1
+
+        # Generate max comparison plot
+        plot_comparison_line_chart(
+            x_labels=x_labels,
+            algorithm_data=max_data,
+            title=f"Algorithm Comparison - {graph_type.capitalize()} - Max Runtime",
+            xlabel="Graph Size (n=vertices, m=edges)",
+            ylabel="Max Runtime (seconds)",
+            output_path=output_dir / "max_runtime_comparison.png",
+        )
+        total_plots += 1
+
+        print(f"    Generated 2 comparison plots for {graph_type}")
+
+    return total_plots > 0
+
+
 def generate_plots(results_dir, plots_dir, algorithm, graph_types):
     """Generate all plots for specified graph types and algorithm."""
     results_path = Path(results_dir)
@@ -306,6 +487,18 @@ def main():
         help="Remove output directory before starting (if it exists)",
     )
 
+    parser.add_argument(
+        "--no-comparison",
+        action="store_true",
+        help="Skip generating comparison plots across algorithms",
+    )
+
+    parser.add_argument(
+        "--comparison-only",
+        action="store_true",
+        help="Only generate comparison plots (skip individual algorithm plots)",
+    )
+
     args = parser.parse_args()
 
     # Validate paths
@@ -346,36 +539,51 @@ def main():
     print(f"  Output directory: {args.output}")
     print(f"  Algorithm(s): {', '.join(algorithms)}")
     print(f"  Graph types: {args.types if args.types else 'all'}")
+    print(f"  Comparison plots: {'skip' if args.no_comparison else ('only' if args.comparison_only else 'yes')}")
 
-    # Generate plots for each algorithm
     all_success = True
-    for i, algorithm in enumerate(algorithms):
-        if len(algorithms) > 1:
-            print(f"\n{'='*60}")
-            print(
-                f"Generating plots for algorithm {i+1}/{len(algorithms)}: {algorithm}"
-            )
-            print(f"{'='*60}")
 
-        success = generate_plots(args.results, args.output, algorithm, args.types)
+    # Generate individual algorithm plots (unless --comparison-only)
+    if not args.comparison_only:
+        for i, algorithm in enumerate(algorithms):
+            if len(algorithms) > 1:
+                print(f"\n{'='*60}")
+                print(
+                    f"Generating plots for algorithm {i+1}/{len(algorithms)}: {algorithm}"
+                )
+                print(f"{'='*60}")
 
-        if not success:
-            print(f"\n  Warning: No plots generated for algorithm: {algorithm}")
-            all_success = False
-        elif len(algorithms) > 1:
-            print(f"\n✓ Completed plots for: {algorithm}")
+            success = generate_plots(args.results, args.output, algorithm, args.types)
 
-    if len(algorithms) > 1:
+            if not success:
+                print(f"\n  Warning: No plots generated for algorithm: {algorithm}")
+                all_success = False
+            elif len(algorithms) > 1:
+                print(f"\n✓ Completed plots for: {algorithm}")
+
+    # Generate comparison plots (unless --no-comparison)
+    if not args.no_comparison:
         print(f"\n{'='*60}")
-        if all_success:
-            print(f"✓ All plot generation complete! ({len(algorithms)} algorithms)")
-        else:
-            print(
-                f"⚠️  Plot generation complete with some warnings ({len(algorithms)} algorithms)"
-            )
+        print("Generating Algorithm Comparison Plots")
         print(f"{'='*60}")
+
+        comparison_success = generate_comparison_plots(
+            args.results, args.output, args.types
+        )
+
+        if not comparison_success:
+            print("\n  Warning: No comparison plots generated")
+            all_success = False
+        else:
+            print("\n✓ Completed comparison plots")
+
+    # Summary
+    print(f"\n{'='*60}")
+    if all_success:
+        print(f"✓ All plot generation complete!")
     else:
-        print("\n✓ Plot generation complete!")
+        print(f"⚠️  Plot generation complete with some warnings")
+    print(f"{'='*60}")
 
     return 0
 
