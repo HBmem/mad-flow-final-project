@@ -11,6 +11,7 @@ Generates all graphs according to the Phase 1 plan (see docs/graph-generation-ph
 Output directory: GeneratedGraphs/
 """
 
+import argparse
 import subprocess
 import sys
 from pathlib import Path
@@ -119,8 +120,12 @@ def run_cli_java(java_dir: Path, class_name: str, args: list):
 # =============================================================================
 
 
-def generate_bipartite_graphs():
-    """Generate all bipartite graphs."""
+def generate_bipartite_graphs(n: int = None):
+    """Generate bipartite graphs.
+
+    Args:
+        n: Number of graphs to generate (default: all)
+    """
     print("\n" + "=" * 60)
     print("Generating Bipartite Graphs")
     print("=" * 60)
@@ -133,7 +138,8 @@ def generate_bipartite_graphs():
         return False
 
     p = BIPARTITE_PARAMS
-    for size in BIPARTITE_SIZES:
+    sizes = BIPARTITE_SIZES[:n] if n is not None else BIPARTITE_SIZES
+    for size in sizes:
         filename = f"{size}s-{size}t-05p-{p['min_cap']}min-{p['max_cap']}max.txt"
         filepath = output_dir / filename
 
@@ -161,8 +167,12 @@ def generate_bipartite_graphs():
     return True
 
 
-def generate_fixed_degree_graphs():
-    """Generate all fixed degree graphs."""
+def generate_fixed_degree_graphs(n: int = None):
+    """Generate fixed degree graphs.
+
+    Args:
+        n: Number of graphs to generate (default: all)
+    """
     print("\n" + "=" * 60)
     print("Generating FixedDegree Graphs")
     print("=" * 60)
@@ -175,7 +185,8 @@ def generate_fixed_degree_graphs():
         return False
 
     p = FIXED_DEGREE_PARAMS
-    for size in FIXED_DEGREE_SIZES:
+    sizes = FIXED_DEGREE_SIZES[:n] if n is not None else FIXED_DEGREE_SIZES
+    for size in sizes:
         filename = (
             f"{size}v-{p['edges_per_node']}out-{p['min_cap']}min-{p['max_cap']}max.txt"
         )
@@ -204,8 +215,12 @@ def generate_fixed_degree_graphs():
     return True
 
 
-def generate_mesh_graphs():
-    """Generate all mesh graphs."""
+def generate_mesh_graphs(n: int = None):
+    """Generate mesh graphs.
+
+    Args:
+        n: Number of graphs to generate (default: all)
+    """
     print("\n" + "=" * 60)
     print("Generating Mesh Graphs")
     print("=" * 60)
@@ -218,7 +233,8 @@ def generate_mesh_graphs():
         return False
 
     p = MESH_PARAMS
-    for size in MESH_SIZES:
+    sizes = MESH_SIZES[:n] if n is not None else MESH_SIZES
+    for size in sizes:
         filename = f"{size}r-{size}c-{p['capacity']}cap-const.txt"
         filepath = output_dir / filename
 
@@ -241,8 +257,12 @@ def generate_mesh_graphs():
     return True
 
 
-def generate_random_graphs():
-    """Generate all random graphs."""
+def generate_random_graphs(n: int = None):
+    """Generate random graphs.
+
+    Args:
+        n: Number of graphs to generate (default: all)
+    """
     print("\n" + "=" * 60)
     print("Generating Random Graphs")
     print("=" * 60)
@@ -255,7 +275,8 @@ def generate_random_graphs():
         return False
 
     p = RANDOM_PARAMS
-    for size in RANDOM_SIZES:
+    sizes = RANDOM_SIZES[:n] if n is not None else RANDOM_SIZES
+    for size in sizes:
         filename = f"{size}v-{p['density']}d-{p['min_cap']}min-{p['max_cap']}max.txt"
         filepath = output_dir / filename
 
@@ -288,10 +309,42 @@ def generate_random_graphs():
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Generate graphs for Phase 1 experiments",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python generate_graphs.py           # Generate all graphs (default)
+  python generate_graphs.py -n 5      # Generate first 5 graphs of each type
+  python generate_graphs.py --num 8   # Generate first 8 graphs of each type
+        """,
+    )
+    parser.add_argument(
+        "-n",
+        "--num",
+        type=int,
+        default=None,
+        help="Number of graphs to generate per type (1-10, default: all)",
+    )
+
+    args = parser.parse_args()
+
+    # Validate and clamp n
+    n = args.num
+    if n is not None:
+        if n < 1:
+            print(f"Warning: n={n} is less than 1, defaulting to 1")
+            n = 1
+        elif n > 10:
+            print(f"Warning: n={n} is greater than 10, defaulting to 10")
+            n = 10
+
     print("=" * 60)
     print("Phase 1 Graph Generation")
     print("=" * 60)
     print(f"Output directory: {OUTPUT_DIR.absolute()}")
+    if n is not None:
+        print(f"Generating first {n} graphs of each type")
 
     # Check that graphGenerationCode directory exists
     if not GRAPH_GEN_DIR.exists():
@@ -305,16 +358,16 @@ def main():
     # Generate all graph types
     all_success = True
 
-    if not generate_bipartite_graphs():
+    if not generate_bipartite_graphs(n):
         all_success = False
 
-    if not generate_fixed_degree_graphs():
+    if not generate_fixed_degree_graphs(n):
         all_success = False
 
-    if not generate_mesh_graphs():
+    if not generate_mesh_graphs(n):
         all_success = False
 
-    if not generate_random_graphs():
+    if not generate_random_graphs(n):
         all_success = False
 
     # Summary
