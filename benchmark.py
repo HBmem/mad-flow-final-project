@@ -535,7 +535,11 @@ def main():
 
     # Determine which algorithms to benchmark
     valid_algorithms = ["ford_fulkerson", "scaling_ford_fulkerson", "preflow_push"]
-    implemented_algorithms = ["ford_fulkerson", "scaling_ford_fulkerson"]
+    implemented_algorithms = [
+        "ford_fulkerson",
+        "scaling_ford_fulkerson",
+        "preflow_push",
+    ]
 
     if args.algorithm:
         # Parse comma-separated list
@@ -548,11 +552,6 @@ def main():
             print(f"Valid algorithms: {', '.join(valid_algorithms)}")
             return 1
 
-        # Check for preflow_push (not yet implemented)
-        if "preflow_push" in algorithms:
-            print("Error: 'preflow_push' algorithm is not yet implemented")
-            print(f"Available algorithms: {', '.join(implemented_algorithms)}")
-            return 1
     else:
         # Auto-detect: use all implemented algorithms
         algorithms = implemented_algorithms

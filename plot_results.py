@@ -289,7 +289,7 @@ def main():
         "--algorithm",
         type=str,
         default=None,
-        help='Algorithm(s) to plot: comma-separated list (e.g., "ford_fulkerson,scaling_ford_fulkerson") or single algorithm. If not specified, plots all available algorithms.',
+        help='Algorithm(s) to plot: comma-separated list (e.g., "ford_fulkerson,scaling_ford_fulkerson,preflow_push") or single algorithm. If not specified, plots all available algorithms.',
     )
 
     parser.add_argument(
