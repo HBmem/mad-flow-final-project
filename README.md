@@ -34,12 +34,14 @@ Options:
 ```
 
 **Per-type parameters** (override defaults for Phase 2 experiments):
+
 - Bipartite: `--bipartite-probability`, `--bipartite-sizes`, `--bipartite-min-cap`, `--bipartite-max-cap`
 - FixedDegree: `--fixeddegree-edges`, `--fixeddegree-sizes`, `--fixeddegree-min-cap`, `--fixeddegree-max-cap`
 - Mesh: `--mesh-capacity`, `--mesh-constant`/`--mesh-random`, `--mesh-sizes`
 - Random: `--random-density`, `--random-sizes`, `--random-min-cap`, `--random-max-cap`
 
 **Examples:**
+
 ```bash
 # Phase 1: Generate all default graphs
 python3 generate_graphs.py
@@ -50,7 +52,7 @@ python3 generate_graphs.py -o GeneratedGraphs2 --types random --random-density 1
 
 ### mad-flow.py - Max Flow Calculator
 
-Computes maximum flow using various algorithms (Ford-Fulkerson, Scaling Ford-Fulkerson).
+Computes maximum flow using various algorithms (Ford-Fulkerson, Scaling Ford-Fulkerson, Preflow-Push).
 
 ```bash
 python3 mad-flow.py -g <graph_file> [options]
@@ -59,7 +61,7 @@ Options:
   -g, --graph      Path to graph file (required)
   -s, --source     Source node (default: 's')
   -t, --sink       Sink node (default: 't')
-  -a, --algorithm  Algorithm: ford_fulkerson, scaling_ford_fulkerson (default: ford_fulkerson)
+  -a, --algorithm  Algorithm: ford_fulkerson, scaling_ford_fulkerson, preflow_push (default: ford_fulkerson)
   --json           Output in JSON format for scripting
 ```
 
@@ -72,6 +74,9 @@ python3 mad-flow.py -g graph.txt
 
 # Using Scaling Ford-Fulkerson algorithm
 python3 mad-flow.py -g graph.txt -a scaling_ford_fulkerson
+
+# Using Preflow-Push algorithm
+python3 mad-flow.py -g graph.txt -a preflow_push
 
 # Machine-readable JSON
 python3 mad-flow.py -g graph.txt -a scaling_ford_fulkerson --json
@@ -89,7 +94,7 @@ Options:
   -i, --input       Input directory with graph subdirectories (required)
   -o, --output      Output directory for results (default: BenchmarkResultsData)
   -a, --algorithm   Algorithm(s): single or comma-separated list, e.g., "ford_fulkerson" or
-                    "ford_fulkerson,scaling_ford_fulkerson"
+                    "ford_fulkerson,scaling_ford_fulkerson,preflow_push"
                     If not specified, automatically benchmarks all implemented algorithms
   -t, --types       Graph types to test: bipartite,mesh,random,fixeddegree (default: all)
   -r, --runs        Number of runs per graph (default: 10)
@@ -101,21 +106,23 @@ Options:
 
 **Output:** Results organized as `BenchmarkResultsData/algorithm/graph_type/results.{json,csv}` with statistics: min, max, mean, median, stddev.
 
-**Auto-Detection:** If no algorithm is specified, `benchmark.py` automatically benchmarks all implemented algorithms (Ford-Fulkerson and Scaling Ford-Fulkerson).
+**Auto-Detection:** If no algorithm is specified, `benchmark.py` automatically benchmarks all implemented algorithms (Ford-Fulkerson, Scaling Ford-Fulkerson, and Preflow-Push).
 
 **Performance:** Uses multiprocessing to benchmark graphs in parallel. Automatically detects CPU count but can be customized with `-p` flag.
 
 **Examples:**
+
 ```bash
-# Auto-benchmark all algorithms (recommended - benchmarks both algorithms)
+# Auto-benchmark all algorithms (recommended - benchmarks all three algorithms)
 python3 benchmark.py -i graphGenerationCode -r 10
 
 # Benchmark specific algorithm only
 python3 benchmark.py -i graphGenerationCode -r 10 -a ford_fulkerson
 python3 benchmark.py -i graphGenerationCode -r 10 -a scaling_ford_fulkerson
+python3 benchmark.py -i graphGenerationCode -r 10 -a preflow_push
 
 # Explicitly specify multiple algorithms
-python3 benchmark.py -i graphGenerationCode -r 10 -a ford_fulkerson,scaling_ford_fulkerson
+python3 benchmark.py -i graphGenerationCode -r 10 -a ford_fulkerson,scaling_ford_fulkerson,preflow_push
 
 # Limit to 4 parallel processes
 python3 benchmark.py -i graphGenerationCode -r 10 -p 4
@@ -145,10 +152,12 @@ Options:
 ```
 
 **Output:**
+
 - Per-algorithm: `BenchmarkResultsPlots/<algorithm>/<graph_type>/{mean,max}_runtime.png`
 - Comparisons: `BenchmarkResultsPlots/Comparisons/<graph_type>/{mean,max}_runtime_comparison.png`
 
 **Examples:**
+
 ```bash
 # Generate all plots including comparisons
 python3 plot_results.py --clean
@@ -179,6 +188,7 @@ python3 plot_results.py --clean --log-scale
 ```
 
 **Phase 2 experiments** (varying parameters):
+
 ```bash
 python3 generate_graphs.py -o GeneratedGraphs2 --types random --random-density 10
 python3 benchmark.py -i GeneratedGraphs2 -o BenchmarkResultsData2 --clean
@@ -211,6 +221,7 @@ The system is built on the `Graph` class which tracks vertices/edges efficiently
 **Graph types supported:** Bipartite, Mesh, Random, FixedDegree
 
 **Algorithms implemented:**
+
 - Ford-Fulkerson (standard augmenting path algorithm)
 - Scaling Ford-Fulkerson (capacity scaling variant for improved performance)
 - Preflow-Push (push-relabel algorithm)
