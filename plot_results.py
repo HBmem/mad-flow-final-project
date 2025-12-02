@@ -249,8 +249,19 @@ def plot_comparison_line_chart(
     xlabel,
     ylabel,
     output_path,
+    use_log_scale=False,
 ):
-    """Create a line chart comparing multiple algorithms."""
+    """Create a line chart comparing multiple algorithms.
+
+    Args:
+        x_labels: Labels for x-axis
+        algorithm_data: Dictionary mapping algorithm names to value lists
+        title: Plot title
+        xlabel: X-axis label
+        ylabel: Y-axis label
+        output_path: Path to save the plot
+        use_log_scale: If True, use log scale for y-axis
+    """
     fig, ax = plt.subplots(figsize=(14, 7))
 
     algorithms = list(algorithm_data.keys())
@@ -278,7 +289,11 @@ def plot_comparison_line_chart(
 
     # Set labels and title
     ax.set_xlabel(xlabel, fontsize=12, fontweight="bold")
-    ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
+    if use_log_scale:
+        ax.set_ylabel(ylabel + " (log scale)", fontsize=12, fontweight="bold")
+        ax.set_yscale("log")
+    else:
+        ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
     ax.set_title(title, fontsize=14, fontweight="bold")
 
     # Set x-axis ticks
@@ -290,12 +305,6 @@ def plot_comparison_line_chart(
     ax.set_axisbelow(True)
     ax.legend(loc="upper left", fontsize=10)
 
-    # Use log scale if values span multiple orders of magnitude
-    all_values = [v for vals in algorithm_data.values() for v in vals if v > 0]
-    if all_values and max(all_values) / (min(all_values) + 1e-10) > 100:
-        ax.set_yscale("log")
-        ax.set_ylabel(ylabel + " (log scale)", fontsize=12, fontweight="bold")
-
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
@@ -303,8 +312,15 @@ def plot_comparison_line_chart(
     print(f"  Saved: {output_path}")
 
 
-def generate_comparison_plots(results_dir, plots_dir, graph_types=None):
-    """Generate comparison plots showing all algorithms side by side for each graph type."""
+def generate_comparison_plots(results_dir, plots_dir, graph_types=None, generate_log_plots=False):
+    """Generate comparison plots showing all algorithms side by side for each graph type.
+
+    Args:
+        results_dir: Directory containing benchmark results
+        plots_dir: Output directory for plots
+        graph_types: Comma-separated list of graph types, or None for all
+        generate_log_plots: If True, also generate log scale versions
+    """
     results_path = Path(results_dir)
     comparison_dir = Path(plots_dir) / "Comparisons"
 
@@ -383,7 +399,7 @@ def generate_comparison_plots(results_dir, plots_dir, graph_types=None):
                 size_to_result[size]["statistics"]["max"] for size in common_sizes
             ]
 
-        # Generate mean comparison plot
+        # Generate mean comparison plot (linear scale)
         plot_comparison_line_chart(
             x_labels=x_labels,
             algorithm_data=mean_data,
@@ -391,10 +407,11 @@ def generate_comparison_plots(results_dir, plots_dir, graph_types=None):
             xlabel="Graph Size (n=vertices, m=edges)",
             ylabel="Mean Runtime (seconds)",
             output_path=output_dir / "mean_runtime_comparison.png",
+            use_log_scale=False,
         )
         total_plots += 1
 
-        # Generate max comparison plot
+        # Generate max comparison plot (linear scale)
         plot_comparison_line_chart(
             x_labels=x_labels,
             algorithm_data=max_data,
@@ -402,10 +419,36 @@ def generate_comparison_plots(results_dir, plots_dir, graph_types=None):
             xlabel="Graph Size (n=vertices, m=edges)",
             ylabel="Max Runtime (seconds)",
             output_path=output_dir / "max_runtime_comparison.png",
+            use_log_scale=False,
         )
         total_plots += 1
 
-        print(f"    Generated 2 comparison plots for {graph_type}")
+        # Generate log scale plots if requested
+        if generate_log_plots:
+            plot_comparison_line_chart(
+                x_labels=x_labels,
+                algorithm_data=mean_data,
+                title=f"Algorithm Comparison - {graph_type.capitalize()} - Mean Runtime (Log Scale)",
+                xlabel="Graph Size (n=vertices, m=edges)",
+                ylabel="Mean Runtime (seconds)",
+                output_path=output_dir / "mean_runtime_comparison_log.png",
+                use_log_scale=True,
+            )
+            total_plots += 1
+
+            plot_comparison_line_chart(
+                x_labels=x_labels,
+                algorithm_data=max_data,
+                title=f"Algorithm Comparison - {graph_type.capitalize()} - Max Runtime (Log Scale)",
+                xlabel="Graph Size (n=vertices, m=edges)",
+                ylabel="Max Runtime (seconds)",
+                output_path=output_dir / "max_runtime_comparison_log.png",
+                use_log_scale=True,
+            )
+            total_plots += 1
+
+        plots_count = 2 if not generate_log_plots else 4
+        print(f"    Generated {plots_count} comparison plots for {graph_type}")
 
     return total_plots > 0
 
@@ -499,6 +542,12 @@ def main():
         help="Only generate comparison plots (skip individual algorithm plots)",
     )
 
+    parser.add_argument(
+        "--log-scale",
+        action="store_true",
+        help="Also generate log scale versions of comparison plots (saved with _log suffix)",
+    )
+
     args = parser.parse_args()
 
     # Validate paths
@@ -540,6 +589,8 @@ def main():
     print(f"  Algorithm(s): {', '.join(algorithms)}")
     print(f"  Graph types: {args.types if args.types else 'all'}")
     print(f"  Comparison plots: {'skip' if args.no_comparison else ('only' if args.comparison_only else 'yes')}")
+    if not args.no_comparison:
+        print(f"  Log scale plots: {'yes' if args.log_scale else 'no'}")
 
     all_success = True
 
@@ -568,7 +619,7 @@ def main():
         print(f"{'='*60}")
 
         comparison_success = generate_comparison_plots(
-            args.results, args.output, args.types
+            args.results, args.output, args.types, args.log_scale
         )
 
         if not comparison_success:
