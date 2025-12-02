@@ -2,5 +2,8 @@ __pycache__/
 *.zip
 *.class
 BenchmarkResultsData/
+BenchmarkResultsData2/
 BenchmarkResultsPlots/
+BenchmarkResultsPlots2/
 GeneratedGraphs/
+GeneratedGraphs2/
