@@ -3,7 +3,10 @@ __pycache__/
 *.class
 BenchmarkResultsData/
 BenchmarkResultsData2/
+BenchmarkResultsData3/
 BenchmarkResultsPlots/
 BenchmarkResultsPlots2/
+BenchmarkResultsPlots3/
 GeneratedGraphs/
 GeneratedGraphs2/
+GeneratedGraphs3/
