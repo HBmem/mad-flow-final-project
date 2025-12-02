@@ -53,6 +53,21 @@ def parse_int_list(s: str) -> list:
     return [int(x.strip()) for x in s.split(",")]
 
 
+def parse_size_pairs(s: str) -> list:
+    """Parse comma-separated size pairs like '50x100,100x200' into list of tuples."""
+    pairs = []
+    for item in s.split(","):
+        item = item.strip()
+        if "x" in item:
+            parts = item.split("x")
+            pairs.append((int(parts[0]), int(parts[1])))
+        else:
+            # Single value means square (rows=cols or source=sink)
+            val = int(item)
+            pairs.append((val, val))
+    return pairs
+
+
 def ensure_compiled(java_dir: Path, java_file: str):
     """Compile Java file if .class doesn't exist."""
     class_file = java_dir / java_file.replace(".java", ".class")
@@ -93,14 +108,14 @@ def run_cli_java(java_dir: Path, class_name: str, args: list):
 
 
 def generate_bipartite_graphs(
-    output_dir: Path, params: dict, sizes: list, n: int = None
+    output_dir: Path, params: dict, size_pairs: list, n: int = None
 ):
     """Generate bipartite graphs.
 
     Args:
         output_dir: Base output directory
         params: Dictionary with probability, min_cap, max_cap
-        sizes: List of sizes (source=sink node counts)
+        size_pairs: List of (source_nodes, sink_nodes) tuples
         n: Number of graphs to generate (default: all)
     """
     print("\n" + "=" * 60)
@@ -114,11 +129,11 @@ def generate_bipartite_graphs(
     if not ensure_compiled(java_dir, "BipartiteGraph.java"):
         return False
 
-    sizes_to_use = sizes[:n] if n is not None else sizes
-    for size in sizes_to_use:
+    pairs_to_use = size_pairs[:n] if n is not None else size_pairs
+    for source_nodes, sink_nodes in pairs_to_use:
         # Format probability for filename (e.g., 0.5 -> 05p)
         prob_str = str(params["probability"]).replace("0.", "").replace(".", "")
-        filename = f"{size}s-{size}t-{prob_str}p-{params['min_cap']}min-{params['max_cap']}max.txt"
+        filename = f"{source_nodes}s-{sink_nodes}t-{prob_str}p-{params['min_cap']}min-{params['max_cap']}max.txt"
         filepath = graph_output_dir / filename
 
         if filepath.exists():
@@ -129,8 +144,8 @@ def generate_bipartite_graphs(
 
         # Command-line args: source_nodes sink_nodes probability min_cap max_cap output_file
         args = [
-            size,
-            size,
+            source_nodes,
+            sink_nodes,
             params["probability"],
             params["min_cap"],
             params["max_cap"],
@@ -195,13 +210,15 @@ def generate_fixed_degree_graphs(
     return True
 
 
-def generate_mesh_graphs(output_dir: Path, params: dict, sizes: list, n: int = None):
+def generate_mesh_graphs(
+    output_dir: Path, params: dict, size_pairs: list, n: int = None
+):
     """Generate mesh graphs.
 
     Args:
         output_dir: Base output directory
         params: Dictionary with capacity, constant
-        sizes: List of row/col sizes
+        size_pairs: List of (rows, cols) tuples
         n: Number of graphs to generate (default: all)
     """
     print("\n" + "=" * 60)
@@ -215,10 +232,10 @@ def generate_mesh_graphs(output_dir: Path, params: dict, sizes: list, n: int = N
     if not ensure_compiled(java_dir, "MeshGenerator.java"):
         return False
 
-    sizes_to_use = sizes[:n] if n is not None else sizes
-    for size in sizes_to_use:
+    pairs_to_use = size_pairs[:n] if n is not None else size_pairs
+    for rows, cols in pairs_to_use:
         cap_type = "const" if params["constant"] else "rand"
-        filename = f"{size}r-{size}c-{params['capacity']}cap-{cap_type}.txt"
+        filename = f"{rows}r-{cols}c-{params['capacity']}cap-{cap_type}.txt"
         filepath = graph_output_dir / filename
 
         if filepath.exists():
@@ -228,7 +245,7 @@ def generate_mesh_graphs(output_dir: Path, params: dict, sizes: list, n: int = N
         print(f"  Generating {filename}...")
 
         # Command-line args: rows, cols, capacity, filename, [-cc for constant]
-        args = [size, size, params["capacity"], str(filepath.absolute())]
+        args = [rows, cols, params["capacity"], str(filepath.absolute())]
         if params["constant"]:
             args.append("-cc")
 
@@ -356,7 +373,19 @@ Examples:
         "--bipartite-sizes",
         type=str,
         default=None,
-        help="Comma-separated sizes (default: 50,100,200,...,1200)",
+        help="Comma-separated sizes for source=sink (e.g., '50,100,200') or pairs (e.g., '50x100,100x200')",
+    )
+    bipartite_group.add_argument(
+        "--bipartite-source-sizes",
+        type=str,
+        default=None,
+        help="Comma-separated source node counts (use with --bipartite-sink-sizes)",
+    )
+    bipartite_group.add_argument(
+        "--bipartite-sink-sizes",
+        type=str,
+        default=None,
+        help="Comma-separated sink node counts (use with --bipartite-source-sizes)",
     )
 
     # FixedDegree parameters
@@ -410,7 +439,19 @@ Examples:
         "--mesh-sizes",
         type=str,
         default=None,
-        help="Comma-separated row/col sizes (default: 20,40,60,...,300)",
+        help="Comma-separated sizes for rows=cols (e.g., '20,40,60') or pairs (e.g., '20x30,40x60')",
+    )
+    mesh_group.add_argument(
+        "--mesh-rows",
+        type=str,
+        default=None,
+        help="Comma-separated row counts (use with --mesh-cols)",
+    )
+    mesh_group.add_argument(
+        "--mesh-cols",
+        type=str,
+        default=None,
+        help="Comma-separated col counts (use with --mesh-rows)",
     )
 
     # Random parameters
@@ -467,11 +508,20 @@ Examples:
         "min_cap": args.bipartite_min_cap,
         "max_cap": args.bipartite_max_cap,
     }
-    bipartite_sizes = (
-        parse_int_list(args.bipartite_sizes)
-        if args.bipartite_sizes
-        else DEFAULT_BIPARTITE_SIZES
-    )
+    # Handle bipartite sizes: source/sink pairs or single sizes
+    if args.bipartite_source_sizes and args.bipartite_sink_sizes:
+        sources = parse_int_list(args.bipartite_source_sizes)
+        sinks = parse_int_list(args.bipartite_sink_sizes)
+        if len(sources) != len(sinks):
+            print(
+                "Error: --bipartite-source-sizes and --bipartite-sink-sizes must have same length"
+            )
+            return 1
+        bipartite_size_pairs = list(zip(sources, sinks))
+    elif args.bipartite_sizes:
+        bipartite_size_pairs = parse_size_pairs(args.bipartite_sizes)
+    else:
+        bipartite_size_pairs = [(s, s) for s in DEFAULT_BIPARTITE_SIZES]
 
     fixeddegree_params = {
         "edges_per_node": args.fixeddegree_edges,
@@ -488,9 +538,18 @@ Examples:
         "capacity": args.mesh_capacity,
         "constant": not args.mesh_random,
     }
-    mesh_sizes = (
-        parse_int_list(args.mesh_sizes) if args.mesh_sizes else DEFAULT_MESH_SIZES
-    )
+    # Handle mesh sizes: row/col pairs or single sizes
+    if args.mesh_rows and args.mesh_cols:
+        rows = parse_int_list(args.mesh_rows)
+        cols = parse_int_list(args.mesh_cols)
+        if len(rows) != len(cols):
+            print("Error: --mesh-rows and --mesh-cols must have same length")
+            return 1
+        mesh_size_pairs = list(zip(rows, cols))
+    elif args.mesh_sizes:
+        mesh_size_pairs = parse_size_pairs(args.mesh_sizes)
+    else:
+        mesh_size_pairs = [(s, s) for s in DEFAULT_MESH_SIZES]
 
     random_params = {
         "density": args.random_density,
@@ -524,7 +583,7 @@ Examples:
 
     if "bipartite" in requested_types:
         if not generate_bipartite_graphs(
-            output_dir, bipartite_params, bipartite_sizes, n
+            output_dir, bipartite_params, bipartite_size_pairs, n
         ):
             all_success = False
 
@@ -535,7 +594,7 @@ Examples:
             all_success = False
 
     if "mesh" in requested_types:
-        if not generate_mesh_graphs(output_dir, mesh_params, mesh_sizes, n):
+        if not generate_mesh_graphs(output_dir, mesh_params, mesh_size_pairs, n):
             all_success = False
 
     if "random" in requested_types:

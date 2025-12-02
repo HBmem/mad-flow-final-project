@@ -312,7 +312,113 @@ def plot_comparison_line_chart(
     print(f"  Saved: {output_path}")
 
 
-def generate_comparison_plots(results_dir, plots_dir, graph_types=None, generate_log_plots=False):
+# Colors for ratio comparison pairs
+RATIO_COLORS = {
+    "FF/SFF": "#e74c3c",  # Red
+    "FF/PFP": "#3498db",  # Blue
+    "SFF/PFP": "#2ecc71",  # Green
+}
+
+
+def plot_ratio_comparison_chart(
+    x_labels,
+    mean_data,
+    title,
+    xlabel,
+    output_path,
+    use_log_scale=False,
+):
+    """Create a line chart showing pairwise runtime ratios between algorithms.
+
+    Args:
+        x_labels: Labels for x-axis (graph sizes)
+        mean_data: Dictionary mapping algorithm names to mean runtime lists
+        title: Plot title
+        xlabel: X-axis label
+        output_path: Path to save the plot
+        use_log_scale: If True, use log scale for y-axis
+    """
+    fig, ax = plt.subplots(figsize=(14, 7))
+
+    indices = range(len(x_labels))
+    algorithms = list(mean_data.keys())
+
+    # Define the pairs to compare (numerator/denominator)
+    # Ratios > 1 mean denominator is faster
+    pairs = [
+        ("ford_fulkerson", "scaling_ford_fulkerson", "FF/SFF"),
+        ("ford_fulkerson", "preflow_push", "FF/PFP"),
+        ("scaling_ford_fulkerson", "preflow_push", "SFF/PFP"),
+    ]
+
+    # Plot each pair that has data
+    plotted_pairs = 0
+    for algo1, algo2, label in pairs:
+        if algo1 in mean_data and algo2 in mean_data:
+            ratios = []
+            for i in range(len(x_labels)):
+                val1 = mean_data[algo1][i]
+                val2 = mean_data[algo2][i]
+                if val2 > 0:
+                    ratios.append(val1 / val2)
+                else:
+                    ratios.append(float("nan"))
+
+            color = RATIO_COLORS.get(label, f"C{plotted_pairs}")
+
+            ax.plot(
+                indices,
+                ratios,
+                label=label,
+                color=color,
+                linewidth=2.5,
+                marker="o",
+                markersize=8,
+                markerfacecolor="white",
+                markeredgewidth=2,
+                markeredgecolor=color,
+            )
+            plotted_pairs += 1
+
+    # Add horizontal reference line at y=1 (equal performance)
+    ax.axhline(
+        y=1,
+        color="gray",
+        linestyle="--",
+        linewidth=1.5,
+        alpha=0.7,
+        label="Equal (ratio=1)",
+    )
+
+    # Set labels and title
+    ax.set_xlabel(xlabel, fontsize=12, fontweight="bold")
+    ylabel = "Runtime Ratio"
+    if use_log_scale:
+        ax.set_ylabel(ylabel + " (log scale)", fontsize=12, fontweight="bold")
+        ax.set_yscale("log")
+    else:
+        ax.set_ylabel(ylabel, fontsize=12, fontweight="bold")
+    ax.set_title(title, fontsize=14, fontweight="bold")
+
+    # Set x-axis ticks
+    ax.set_xticks(indices)
+    ax.set_xticklabels(x_labels, rotation=45, ha="right", fontsize=9)
+
+    # Add grid and legend
+    ax.grid(axis="both", alpha=0.3, linestyle="--")
+    ax.set_axisbelow(True)
+    ax.legend(loc="best", fontsize=10)
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    print(f"  Saved: {output_path}")
+
+
+def generate_comparison_plots(
+    results_dir, plots_dir, graph_types=None, generate_log_plots=False
+):
     """Generate comparison plots showing all algorithms side by side for each graph type.
 
     Args:
@@ -389,9 +495,7 @@ def generate_comparison_plots(results_dir, plots_dir, graph_types=None, generate
         mean_data = {}
         max_data = {}
         for algorithm, results in all_data.items():
-            size_to_result = {
-                (r["num_vertices"], r["num_edges"]): r for r in results
-            }
+            size_to_result = {(r["num_vertices"], r["num_edges"]): r for r in results}
             mean_data[algorithm] = [
                 size_to_result[size]["statistics"]["mean"] for size in common_sizes
             ]
@@ -447,7 +551,30 @@ def generate_comparison_plots(results_dir, plots_dir, graph_types=None, generate
             )
             total_plots += 1
 
-        plots_count = 2 if not generate_log_plots else 4
+        # Generate ratio comparison plot (always generate this one)
+        plot_ratio_comparison_chart(
+            x_labels=x_labels,
+            mean_data=mean_data,
+            title=f"Algorithm Ratio Comparison - {graph_type.capitalize()}",
+            xlabel="Graph Size (n=vertices, m=edges)",
+            output_path=output_dir / "ratio_comparison.png",
+            use_log_scale=False,
+        )
+        total_plots += 1
+
+        # Generate log scale ratio plot if requested
+        if generate_log_plots:
+            plot_ratio_comparison_chart(
+                x_labels=x_labels,
+                mean_data=mean_data,
+                title=f"Algorithm Ratio Comparison - {graph_type.capitalize()} (Log Scale)",
+                xlabel="Graph Size (n=vertices, m=edges)",
+                output_path=output_dir / "ratio_comparison_log.png",
+                use_log_scale=True,
+            )
+            total_plots += 1
+
+        plots_count = 3 if not generate_log_plots else 6
         print(f"    Generated {plots_count} comparison plots for {graph_type}")
 
     return total_plots > 0
@@ -588,7 +715,9 @@ def main():
     print(f"  Output directory: {args.output}")
     print(f"  Algorithm(s): {', '.join(algorithms)}")
     print(f"  Graph types: {args.types if args.types else 'all'}")
-    print(f"  Comparison plots: {'skip' if args.no_comparison else ('only' if args.comparison_only else 'yes')}")
+    print(
+        f"  Comparison plots: {'skip' if args.no_comparison else ('only' if args.comparison_only else 'yes')}"
+    )
     if not args.no_comparison:
         print(f"  Log scale plots: {'yes' if args.log_scale else 'no'}")
 

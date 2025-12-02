@@ -1,24 +1,52 @@
 # Max Flow Algorithm Analysis
 
-A complete toolkit for computing, benchmarking, and visualizing max flow algorithms on various graph types.
+A complete toolkit for generating graphs, computing max flow, benchmarking algorithms, and visualizing results.
 
 ## Quick Start
 
 ```bash
-# Run max flow on a single graph (default: Ford-Fulkerson)
-python3 mad-flow.py -g graphGenerationCode/Mesh/smallMesh.txt
+# Generate test graphs
+python3 generate_graphs.py -n 5              # First 5 sizes of each type
 
-# Run with Scaling Ford-Fulkerson algorithm
-python3 mad-flow.py -g graphGenerationCode/Mesh/smallMesh.txt -a scaling_ford_fulkerson
+# Run max flow on a single graph
+python3 mad-flow.py -g GeneratedGraphs/Mesh/20r-20c-1000cap-const.txt
 
-# Benchmark all algorithms (auto-detects and runs both, outputs to BenchmarkResultsData/)
-python3 benchmark.py -i graphGenerationCode -r 10
+# Benchmark all algorithms
+python3 benchmark.py -i GeneratedGraphs -r 10 --clean
 
-# Generate visualization plots for all algorithms (outputs to BenchmarkResultsPlots/)
-python3 plot_results.py
+# Generate plots with algorithm comparisons
+python3 plot_results.py --clean --log-scale
 ```
 
 ## Tools
+
+### generate_graphs.py - Graph Generator
+
+Generates test graphs for benchmarking. Supports Phase 1 (size scaling) and Phase 2 (parameter variation) experiments.
+
+```bash
+python3 generate_graphs.py [options]
+
+Options:
+  -n, --num         Number of graphs per type (1-10, default: all 10)
+  -o, --output      Output directory (default: GeneratedGraphs)
+  --types           Graph types: bipartite,fixeddegree,mesh,random (default: all)
+```
+
+**Per-type parameters** (override defaults for Phase 2 experiments):
+- Bipartite: `--bipartite-probability`, `--bipartite-sizes`, `--bipartite-min-cap`, `--bipartite-max-cap`
+- FixedDegree: `--fixeddegree-edges`, `--fixeddegree-sizes`, `--fixeddegree-min-cap`, `--fixeddegree-max-cap`
+- Mesh: `--mesh-capacity`, `--mesh-constant`/`--mesh-random`, `--mesh-sizes`
+- Random: `--random-density`, `--random-sizes`, `--random-min-cap`, `--random-max-cap`
+
+**Examples:**
+```bash
+# Phase 1: Generate all default graphs
+python3 generate_graphs.py
+
+# Phase 2: Vary density on random graphs
+python3 generate_graphs.py -o GeneratedGraphs2 --types random --random-density 10
+```
 
 ### mad-flow.py - Max Flow Calculator
 
@@ -100,71 +128,61 @@ python3 benchmark.py -i graphGenerationCode -r 10 -p 1
 
 ### plot_results.py - Visualization
 
-Generates plots showing runtime vs input size relationships.
+Generates plots showing runtime vs input size relationships, including algorithm comparison charts.
 
 ```bash
 python3 plot_results.py [options]
 
 Options:
-  -r, --results    Directory with benchmark results (default: BenchmarkResultsData)
-  -o, --output     Output directory for plots (default: BenchmarkResultsPlots)
-  -a, --algorithm  Algorithm(s) to plot: comma-separated list or single algorithm
-                   If not specified, automatically plots all available algorithms
-  -t, --types      Graph types to plot (default: all)
-  --clean          Remove output directory before starting (safeguard against accidental overwrites)
+  -r, --results       Directory with benchmark results (default: BenchmarkResultsData)
+  -o, --output        Output directory for plots (default: BenchmarkResultsPlots)
+  -a, --algorithm     Algorithm(s) to plot (default: all available)
+  -t, --types         Graph types to plot (default: all)
+  --clean             Remove output directory before starting
+  --no-comparison     Skip algorithm comparison plots
+  --comparison-only   Only generate comparison plots
+  --log-scale         Also generate log scale comparison plots (saved with _log suffix)
 ```
 
-**Output:** 2 plots per graph type (`mean_runtime.png` and `max_runtime.png`) in `BenchmarkResultsPlots/<algorithm>/<graph_type>/`. Each plot shows input size (n×m) on the x-axis with annotations indicating the number of vertices (n) and edges (m).
-
-**Auto-Detection:** If no algorithm is specified, `plot_results.py` automatically detects and plots all algorithms found in the results directory.
+**Output:**
+- Per-algorithm: `BenchmarkResultsPlots/<algorithm>/<graph_type>/{mean,max}_runtime.png`
+- Comparisons: `BenchmarkResultsPlots/Comparisons/<graph_type>/{mean,max}_runtime_comparison.png`
 
 **Examples:**
 ```bash
-# Plot all algorithms automatically (recommended after multi-algorithm benchmark)
-python3 plot_results.py
+# Generate all plots including comparisons
+python3 plot_results.py --clean
 
-# Plot specific algorithm
-python3 plot_results.py -a ford_fulkerson
+# Generate with log scale versions
+python3 plot_results.py --clean --log-scale
 
-# Plot multiple specific algorithms
-python3 plot_results.py -a ford_fulkerson,scaling_ford_fulkerson
-
-# Plot only mesh graphs for all algorithms
-python3 plot_results.py -t mesh
+# Only comparison plots
+python3 plot_results.py --clean --comparison-only
 ```
-
-**Note:** If output directory exists, you must use `--clean` or specify a different output directory to prevent accidental data loss.
 
 ## Complete Workflow
 
 ```bash
-# Step 1: Run benchmarks for all algorithms (auto-detects both, 10 runs per graph)
-python3 benchmark.py -i graphGenerationCode -r 10
+# Step 1: Generate graphs
+python3 generate_graphs.py
 
-# Step 2: Generate plots for all algorithms (auto-detects both)
-python3 plot_results.py
+# Step 2: Run benchmarks for all algorithms
+python3 benchmark.py -i GeneratedGraphs -r 10 --clean
 
-# Step 3: View results
+# Step 3: Generate plots with comparisons
+python3 plot_results.py --clean --log-scale
+
+# Step 4: View results
 # - Data: BenchmarkResultsData/<algorithm>/<graph_type>/results.{json,csv}
-# - Plots: BenchmarkResultsPlots/<algorithm>/<graph_type>/{mean_runtime.png,max_runtime.png}
+# - Plots: BenchmarkResultsPlots/<algorithm>/<graph_type>/
+# - Comparisons: BenchmarkResultsPlots/Comparisons/<graph_type>/
+```
 
-# Alternative: Run specific algorithms
-# Ford-Fulkerson only
-python3 benchmark.py -i graphGenerationCode -r 10 -a ford_fulkerson
-
-# Scaling Ford-Fulkerson only
-python3 benchmark.py -i graphGenerationCode -r 10 -a scaling_ford_fulkerson
-
-# Explicit multi-algorithm
-python3 benchmark.py -i graphGenerationCode -r 10 -a ford_fulkerson,scaling_ford_fulkerson
-
-# Plot specific algorithms:
-python3 plot_results.py -a ford_fulkerson
-python3 plot_results.py -a scaling_ford_fulkerson
-
-# To re-run and replace existing results, use --clean:
-python3 benchmark.py -i graphGenerationCode -r 10 --clean
-python3 plot_results.py --clean
+**Phase 2 experiments** (varying parameters):
+```bash
+python3 generate_graphs.py -o GeneratedGraphs2 --types random --random-density 10
+python3 benchmark.py -i GeneratedGraphs2 -o BenchmarkResultsData2 --clean
+python3 plot_results.py -r BenchmarkResultsData2 -o BenchmarkResultsPlots2 --clean
 ```
 
 ## Graph File Format
@@ -195,4 +213,4 @@ The system is built on the `Graph` class which tracks vertices/edges efficiently
 **Algorithms implemented:**
 - Ford-Fulkerson (standard augmenting path algorithm)
 - Scaling Ford-Fulkerson (capacity scaling variant for improved performance)
-- Preflow-Push (placeholder for future implementation)
+- Preflow-Push (push-relabel algorithm)
