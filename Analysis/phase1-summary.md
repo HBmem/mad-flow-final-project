@@ -90,16 +90,16 @@ Phase 1 experiments tested three maximum flow algorithms on four graph types wit
 
 ### Runtime Ratios (Mean)
 
-| Graph Size | FF/SFF | FF/PFP | SFF/PFP |
-|------------|--------|--------|---------|
-| 50x50 | 0.86 | 0.87 | 1.02 |
-| 100x100 | 1.16 | 1.25 | 1.08 |
-| 200x200 | 1.75 | 0.04 | 0.02 |
-| 300x300 | 2.28 | 0.03 | 0.02 |
-| 400x400 | 2.18 | 0.03 | 0.02 |
-| 500x500 | 2.44 | 5.62 | 2.30 |
-| 600x600 | 2.37 | 7.55 | 3.18 |
-| 800x800 | 2.28 | 0.02 | 0.01 |
+| Graph Size | Edges | FF/SFF | FF/PFP | SFF/PFP |
+|------------|-------|--------|--------|---------|
+| 50x50 | 1,331 | 0.86 | 0.87 | 1.02 |
+| 100x100 | 5,212 | 1.16 | 1.25 | 1.08 |
+| 200x200 | 20,509 | 1.75 | 0.04 | 0.02 |
+| 300x300 | 45,532 | 2.28 | 0.03 | 0.02 |
+| 400x400 | 80,460 | 2.18 | 0.03 | 0.02 |
+| 500x500 | 126,084 | 2.44 | 5.62 | 2.30 |
+| 600x600 | 181,708 | 2.37 | 7.55 | 3.18 |
+| 800x800 | 321,677 | 2.28 | 0.02 | 0.01 |
 
 **Key Insight**: Preflow-Push shows erratic performance on bipartite graphs, excellent on some sizes (500, 600) but catastrophic on others (200-400, 800). SFF consistently outperforms FF by 2-2.5x.
 
@@ -130,16 +130,16 @@ Phase 1 experiments tested three maximum flow algorithms on four graph types wit
 
 ### Runtime Ratios (Mean)
 
-| Graph Size | FF/SFF | FF/PFP | SFF/PFP |
-|------------|--------|--------|---------|
-| 20x20 | 1.27 | 1.00 | 0.79 |
-| 40x40 | 1.47 | 0.25 | 0.17 |
-| 60x60 | 1.25 | 0.09 | 0.07 |
-| 80x80 | 1.12 | 0.06 | 0.05 |
-| 100x100 | 1.28 | 0.06 | 0.05 |
-| 125x125 | 1.15 | 0.05 | 0.04 |
-| 150x150 | 1.19 | 0.05 | 0.04 |
-| 200x200 | 1.29 | 0.04 | 0.03 |
+| Graph Size | Edges | FF/SFF | FF/PFP | SFF/PFP |
+|------------|-------|--------|--------|---------|
+| 20x20 | 1,180 | 1.27 | 1.00 | 0.79 |
+| 40x40 | 4,760 | 1.47 | 0.25 | 0.17 |
+| 60x60 | 10,740 | 1.25 | 0.09 | 0.07 |
+| 80x80 | 19,120 | 1.12 | 0.06 | 0.05 |
+| 100x100 | 29,900 | 1.28 | 0.06 | 0.05 |
+| 125x125 | 46,750 | 1.15 | 0.05 | 0.04 |
+| 150x150 | 67,350 | 1.19 | 0.05 | 0.04 |
+| 200x200 | 119,800 | 1.29 | 0.04 | 0.03 |
 
 **Key Insight**: SFF dominates on mesh graphs, consistently 15-30% faster than FF. Preflow-Push scales very poorly (O(n²m) behavior), becoming 20-30x slower than SFF on larger meshes.
 
@@ -170,16 +170,16 @@ Phase 1 experiments tested three maximum flow algorithms on four graph types wit
 
 ### Runtime Ratios (Mean)
 
-| Graph Size | FF/SFF | FF/PFP | SFF/PFP |
-|------------|--------|--------|---------|
-| 100v | 0.91 | 0.17 | 0.19 |
-| 250v | 1.36 | 1.07 | 0.79 |
-| 500v | 1.20 | 0.01 | 0.01 |
-| 1000v | 1.28 | 0.90 | 0.71 |
-| 1500v | 1.48 | 0.99 | 0.67 |
-| 2000v | 1.36 | 0.00 | 0.00 |
-| 2500v | 1.30 | 0.00 | 0.00 |
-| 3000v | 1.26 | 0.00 | 0.00 |
+| Graph Size | Edges | FF/SFF | FF/PFP | SFF/PFP |
+|------------|-------|--------|--------|---------|
+| 100v | 3,060 | 0.91 | 0.17 | 0.19 |
+| 250v | 7,560 | 1.36 | 1.07 | 0.79 |
+| 500v | 15,060 | 1.20 | 0.01 | 0.01 |
+| 1000v | 30,060 | 1.28 | 0.90 | 0.71 |
+| 1500v | 45,060 | 1.48 | 0.99 | 0.67 |
+| 2000v | 60,060 | 1.36 | 0.00 | 0.00 |
+| 2500v | 75,060 | 1.30 | 0.00 | 0.00 |
+| 3000v | 90,060 | 1.26 | 0.00 | 0.00 |
 
 **Key Insight**: Preflow-Push catastrophically fails on certain fixed-degree graphs (500v, 2000v+), taking hundreds of seconds. SFF is consistently 25-50% faster than FF and orders of magnitude faster than PFP on problematic cases.
 
@@ -210,16 +210,16 @@ Phase 1 experiments tested three maximum flow algorithms on four graph types wit
 
 ### Runtime Ratios (Mean)
 
-| Graph Size | FF/SFF | FF/PFP | SFF/PFP |
-|------------|--------|--------|---------|
-| 100v | 1.23 | 1.20 | 0.98 |
-| 200v | 1.22 | 1.68 | 1.38 |
-| 400v | 1.42 | 1.67 | 1.18 |
-| 600v | 1.59 | 2.29 | 1.44 |
-| 800v | 1.58 | 0.02 | 0.01 |
-| 1000v | 1.48 | 0.02 | 0.01 |
-| 1250v | 1.86 | 3.90 | 2.09 |
-| 1500v | 1.94 | 3.67 | 1.89 |
+| Graph Size | Edges | FF/SFF | FF/PFP | SFF/PFP |
+|------------|-------|--------|--------|---------|
+| 100v | 2,947 | 1.23 | 1.20 | 0.98 |
+| 200v | 12,206 | 1.22 | 1.68 | 1.38 |
+| 400v | 47,271 | 1.42 | 1.67 | 1.18 |
+| 600v | 107,589 | 1.59 | 2.29 | 1.44 |
+| 800v | 191,043 | 1.58 | 0.02 | 0.01 |
+| 1000v | 298,712 | 1.48 | 0.02 | 0.01 |
+| 1250v | 467,890 | 1.86 | 3.90 | 2.09 |
+| 1500v | 672,543 | 1.94 | 3.67 | 1.89 |
 
 **Key Insight**: Preflow-Push excels on most random graphs (2-4x faster than FF), but fails catastrophically at 800-1000 vertices. SFF provides consistent performance, 1.4-2x faster than FF across all sizes.
 
