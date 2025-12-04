@@ -141,10 +141,14 @@ def plot_bar_chart(
             )
 
     plt.tight_layout()
+    # Save PNG
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    # Save SVG
+    svg_path = output_path.with_suffix(".svg")
+    plt.savefig(svg_path, format="svg", bbox_inches="tight")
     plt.close()
 
-    print(f"  Saved: {output_path}")
+    print(f"  Saved: {output_path} and {svg_path}")
 
 
 def generate_metric_plots(
@@ -306,10 +310,14 @@ def plot_comparison_line_chart(
     ax.legend(loc="upper left", fontsize=10)
 
     plt.tight_layout()
+    # Save PNG
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    # Save SVG
+    svg_path = output_path.with_suffix(".svg")
+    plt.savefig(svg_path, format="svg", bbox_inches="tight")
     plt.close()
 
-    print(f"  Saved: {output_path}")
+    print(f"  Saved: {output_path} and {svg_path}")
 
 
 # Colors for ratio comparison pairs
@@ -410,10 +418,14 @@ def plot_ratio_comparison_chart(
     ax.legend(loc="best", fontsize=10)
 
     plt.tight_layout()
+    # Save PNG
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    # Save SVG
+    svg_path = output_path.with_suffix(".svg")
+    plt.savefig(svg_path, format="svg", bbox_inches="tight")
     plt.close()
 
-    print(f"  Saved: {output_path}")
+    print(f"  Saved: {output_path} and {svg_path}")
 
 
 def generate_comparison_plots(
@@ -624,7 +636,7 @@ def main():
         "--results",
         type=str,
         default="BenchmarkResultsData",
-        help="Directory containing benchmark results (default: BenchmarkResultsData)",
+        help="Input directory containing benchmark results (default: BenchmarkResultsData)",
     )
 
     parser.add_argument(
