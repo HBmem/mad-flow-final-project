@@ -1,0 +1,46 @@
+{
+  "algorithm": "ford_fulkerson",
+  "graph_type": "fixeddegree",
+  "results": [
+    {
+      "graph_file": "100v-30out-1min-1000max.txt",
+      "num_vertices": 102,
+      "num_edges": 3060,
+      "max_flow": 11893,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.05119891604408622,
+        "max": 0.14111416600644588,
+        "mean": 0.09615654102526605,
+        "median": 0.09615654102526605,
+        "stddev": 0.06357968298046798
+      },
+      "all_times": [
+        0.14111416600644588,
+        0.05119891604408622
+      ],
+      "errors": null
+    },
+    {
+      "graph_file": "250v-30out-1min-1000max.txt",
+      "num_vertices": 252,
+      "num_edges": 7560,
+      "max_flow": 14738,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.05950345913879573,
+        "max": 0.14758916688151658,
+        "mean": 0.10354631301015615,
+        "median": 0.10354631301015615,
+        "stddev": 0.06228600127049428
+      },
+      "all_times": [
+        0.14758916688151658,
+        0.05950345913879573
+      ],
+      "errors": null
+    }
+  ]
+}

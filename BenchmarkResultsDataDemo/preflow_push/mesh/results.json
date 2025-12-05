@@ -1,0 +1,46 @@
+{
+  "algorithm": "preflow_push",
+  "graph_type": "mesh",
+  "results": [
+    {
+      "graph_file": "20r-20c-1000cap-const.txt",
+      "num_vertices": 402,
+      "num_edges": 1180,
+      "max_flow": 20000,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.06123854196630418,
+        "max": 0.07609754195436835,
+        "mean": 0.06866804196033627,
+        "median": 0.06866804196033627,
+        "stddev": 0.010506899653211003
+      },
+      "all_times": [
+        0.07609754195436835,
+        0.06123854196630418
+      ],
+      "errors": null
+    },
+    {
+      "graph_file": "40r-40c-1000cap-const.txt",
+      "num_vertices": 1602,
+      "num_edges": 4760,
+      "max_flow": 40000,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.22615741612389684,
+        "max": 0.29935274994932115,
+        "mean": 0.262755083036609,
+        "median": 0.262755083036609,
+        "stddev": 0.05175691689917061
+      },
+      "all_times": [
+        0.29935274994932115,
+        0.22615741612389684
+      ],
+      "errors": null
+    }
+  ]
+}

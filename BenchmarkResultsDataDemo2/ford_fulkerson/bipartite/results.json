@@ -1,0 +1,44 @@
+{
+  "algorithm": "ford_fulkerson",
+  "graph_type": "bipartite",
+  "results": [
+    {
+      "graph_file": "100s-100t-5p-1min-1000max.txt",
+      "num_vertices": 202,
+      "num_edges": 5199,
+      "max_flow": 48044,
+      "num_successful_runs": 1,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.10228829109109938,
+        "max": 0.10228829109109938,
+        "mean": 0.10228829109109938,
+        "median": 0.10228829109109938,
+        "stddev": 0.0
+      },
+      "all_times": [
+        0.10228829109109938
+      ],
+      "errors": null
+    },
+    {
+      "graph_file": "50s-50t-5p-1min-1000max.txt",
+      "num_vertices": 102,
+      "num_edges": 1312,
+      "max_flow": 25204,
+      "num_successful_runs": 1,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.07569666695781052,
+        "max": 0.07569666695781052,
+        "mean": 0.07569666695781052,
+        "median": 0.07569666695781052,
+        "stddev": 0.0
+      },
+      "all_times": [
+        0.07569666695781052
+      ],
+      "errors": null
+    }
+  ]
+}

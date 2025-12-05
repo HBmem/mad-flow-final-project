@@ -1,0 +1,46 @@
+{
+  "algorithm": "preflow_push",
+  "graph_type": "bipartite",
+  "results": [
+    {
+      "graph_file": "100s-100t-5p-1min-1000max.txt",
+      "num_vertices": 202,
+      "num_edges": 5199,
+      "max_flow": 48044,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.622653917176649,
+        "max": 0.748246124945581,
+        "mean": 0.685450021061115,
+        "median": 0.685450021061115,
+        "stddev": 0.08880710177760161
+      },
+      "all_times": [
+        0.748246124945581,
+        0.622653917176649
+      ],
+      "errors": null
+    },
+    {
+      "graph_file": "50s-50t-5p-1min-1000max.txt",
+      "num_vertices": 102,
+      "num_edges": 1312,
+      "max_flow": 25204,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.052079458022490144,
+        "max": 0.05362625000998378,
+        "mean": 0.05285285401623696,
+        "median": 0.05285285401623696,
+        "stddev": 0.0010937471034417662
+      },
+      "all_times": [
+        0.052079458022490144,
+        0.05362625000998378
+      ],
+      "errors": null
+    }
+  ]
+}

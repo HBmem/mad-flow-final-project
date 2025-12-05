@@ -316,3 +316,49 @@ Where:
 - C = maximum edge capacity
 
 **Important**: All algorithms run within their stated bounds. "Variance" refers to how much the constant factor varies between best-case and worst-case graph structures. High variance means unpredictable performance even though the asymptotic bound is never violated.
+
+---
+
+## Summary
+
+Scaling Ford-Fulkerson (SFF) — Clear winner overall
+
+- Won 53% of tests across all phases
+- Zero catastrophic failures
+- Most resistant to density and capacity variations
+
+Ford-Fulkerson (FF) — Simple and reliable
+
+- Won 22% of tests; excels on mesh graphs with low capacity
+- Zero catastrophic failures
+- Achieved 6-23× speedup when C dropped from 1000 to 10
+
+Preflow-Push (PFP) — Unpredictable
+
+- Won 25% but had 34+ catastrophic failures (>10× slower than best)
+- O(n²m) bound always holds—variance is in the constant factor (100-1000×)
+- Missing heuristics (gap, global relabeling) likely cause the erratic behavior
+
+---
+
+## Empirical Study Approach
+
+**3 experimental phases** testing key algorithm parameters (V, E, C):
+
+| Phase | Focus | What Changed | Hypothesis |
+|-------|-------|--------------|------------|
+| **1** | Baseline | Vertex count (8 sizes × 4 graph types) | Establish performance rankings |
+| **2** | Density | ↑ Edge probability (0.8 vs 0.5), ↑ edges/node (50 vs 30) | Should PFP benefit from local operations? |
+| **3** | Capacity | ↓ Max capacity (10 vs 1000) | Should FF see ~100× speedup (O(mC))? |
+
+**Graph types tested**: Bipartite, Mesh, FixedDegree, Random
+
+**For each configuration**: 5 runs averaged, parallel benchmarking, automated analysis/plotting
+
+### Challenges & Solutions
+
+| Challenge | Solution |
+|-----------|----------|
+| PFP complexity & correctness | Careful study of textbook pseudo-code |
+| Long runtimes (hours+) | Reduced max graph sizes |
+| Manual testing friction | Built flexible toolkit for graph generation, parallel benchmarking, and automated plotting |

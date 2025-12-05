@@ -1,0 +1,44 @@
+{
+  "algorithm": "scaling_ford_fulkerson",
+  "graph_type": "fixeddegree",
+  "results": [
+    {
+      "graph_file": "100v-30out-1min-1000max.txt",
+      "num_vertices": 102,
+      "num_edges": 3060,
+      "max_flow": 11893,
+      "num_successful_runs": 1,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.06050408398732543,
+        "max": 0.06050408398732543,
+        "mean": 0.06050408398732543,
+        "median": 0.06050408398732543,
+        "stddev": 0.0
+      },
+      "all_times": [
+        0.06050408398732543
+      ],
+      "errors": null
+    },
+    {
+      "graph_file": "250v-30out-1min-1000max.txt",
+      "num_vertices": 252,
+      "num_edges": 7560,
+      "max_flow": 14738,
+      "num_successful_runs": 1,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.06983516691252589,
+        "max": 0.06983516691252589,
+        "mean": 0.06983516691252589,
+        "median": 0.06983516691252589,
+        "stddev": 0.0
+      },
+      "all_times": [
+        0.06983516691252589
+      ],
+      "errors": null
+    }
+  ]
+}

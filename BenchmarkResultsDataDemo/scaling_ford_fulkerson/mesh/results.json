@@ -1,0 +1,46 @@
+{
+  "algorithm": "scaling_ford_fulkerson",
+  "graph_type": "mesh",
+  "results": [
+    {
+      "graph_file": "20r-20c-1000cap-const.txt",
+      "num_vertices": 402,
+      "num_edges": 1180,
+      "max_flow": 20000,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.05387112498283386,
+        "max": 0.05583687499165535,
+        "mean": 0.054853999987244606,
+        "median": 0.054853999987244606,
+        "stddev": 0.0013899951613551894
+      },
+      "all_times": [
+        0.05387112498283386,
+        0.05583687499165535
+      ],
+      "errors": null
+    },
+    {
+      "graph_file": "40r-40c-1000cap-const.txt",
+      "num_vertices": 1602,
+      "num_edges": 4760,
+      "max_flow": 40000,
+      "num_successful_runs": 2,
+      "num_failed_runs": 0,
+      "statistics": {
+        "min": 0.055064290994778275,
+        "max": 0.06984283309429884,
+        "mean": 0.06245356204453856,
+        "median": 0.06245356204453856,
+        "stddev": 0.010450007334621867
+      },
+      "all_times": [
+        0.06984283309429884,
+        0.055064290994778275
+      ],
+      "errors": null
+    }
+  ]
+}
