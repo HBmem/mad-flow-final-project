@@ -1,5 +1,6 @@
 from collections import defaultdict, deque
 
+
 def preflow_push_max_flow(capacity, source, sink):
     # Collect all vertices that appear in the capacity graph
     vertices = set(capacity.keys())
@@ -38,10 +39,7 @@ def preflow_push_max_flow(capacity, source, sink):
         excess[source] -= c
 
     # Active nodes = nodes with extra flow (except s and t)
-    active = deque(
-        u for u in vertices
-        if u not in (source, sink) and excess[u] > 0
-    )
+    active = deque(u for u in vertices if u not in (source, sink) and excess[u] > 0)
 
     def push(u, v):
         # Push whatever u can send through (u, v)
@@ -106,19 +104,3 @@ def preflow_push(graph, source, sink):
                 capacity[u][v] = c
 
     return preflow_push_max_flow(capacity, source, sink)
-
-
-if __name__ == "__main__":
-    # Small sanity check graph:
-    # s -> a (10), s -> b (5)
-    # a -> t (5),  b -> t (10)
-    # Correct max flow here is 10.
-    capacity = {
-        "s": {"a": 10, "b": 5},
-        "a": {"t": 5},
-        "b": {"t": 10},
-        "t": {},
-    }
-
-    max_flow = preflow_push_max_flow(capacity, "s", "t")
-    print("Test max flow (expected 10):", max_flow)
