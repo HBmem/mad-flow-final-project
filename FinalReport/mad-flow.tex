@@ -1,0 +1,265 @@
+%%
+%% This is file `sample-sigconf.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `all,proceedings,bibtex,sigconf')
+%%
+%% IMPORTANT NOTICE:
+%%
+%% For the copyright see the source file.
+%%
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigconf.tex.
+%%
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%%
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%% The first command in your LaTeX source must be the \documentclass
+%% command.
+%%
+%% For submission and review of your manuscript please change the
+%% command to \documentclass[manuscript, screen, review]{acmart}.
+%%
+%% When submitting camera ready or to TAPS, please change the command
+%% to \documentclass[sigconf]{acmart} or whichever template is required
+%% for your publication.
+%%
+%%
+\documentclass[sigconf]{acmart}
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmlicensed}
+\copyrightyear{2018}
+\acmYear{2018}
+\acmDOI{XXXXXXX.XXXXXXX}
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[Conference acronym 'XX]{Make sure to enter the correct
+  conference title from your rights confirmation email}{June 03--05,
+  2018}{Woodstock, NY}
+%%
+%%  Uncomment \acmBooktitle if the title of the proceedings is different
+%%  from ``Proceedings of ...''!
+%%
+%%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%%  June 03--05, 2018, Woodstock, NY}
+\acmISBN{978-1-4503-XXXX-X/2018/06}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{An Emperical Analysis of Network Flow Algorithms}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Dustin Cannon}
+\email{dustic@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+\author{Headley Brissett}
+\email{hbriss@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+\author{Chris Biju}
+\email{chrisb10@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+\author{Eric Chu}
+\email{cwchuftw@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Cannon et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+  We analyzed three different network flow algorithms; classic Ford Fulkerson, Scaling Ford Fulkerson, and Preflow Push, on four different sets of input graphs; bipartite, fixed degree, mesh, and random. Each set of graphs grows in size (nodes/edges) by a fixed amount allowing us to isolate the effect of input size on the performance of each algorithm for each type of graph. We also compare the performance of the algorithms to each other to see if some algorithms perform better on certain types of graphs relative to the others.
+
+  The set of input graphs were generated by preexisting Java code which we modified slightly to make generation of graphs scriptable and reproducible for a given set of input parameters, while our network flow algorithms are implemented in Python.
+\end{abstract}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+
+In the field of combinatorial optimization, network flow problems constitute a fundamental class of computational challenges. The input for such a problem is a flow network, which is essentially a graph endowed with numerical capacity constraints on its edges. The objective is to construct a valid flow, consisting of numerical values assigned to each edge. This flow must adhere to two core constraints: first, the flow must not exceed the specified capacity on any edge; and second, the principle of flow conservation must be satisfied, meaning that the total incoming flow must equal the total outgoing flow at every vertex, with the exception of designated terminal nodes (the source and the sink).
+
+This study aims to provide an empirical performance evaluation of three distinct network flow algorithms: \textbf{Ford-Fulkerson}, \textbf{Scaling Ford-Fulkerson}, and the \textbf{Preflow-Push} algorithm. We conduct this analysis across four different classes of input graphs—bipartite, fixed degree, mesh, and random—by systematically adjusting the properties of the input graph. The experiment is structured into three phases to isolate the impact of different graph characteristics on performance: Phase 1 involves increasing only the number of vertices. Phase 2 uses smaller graphs but focuses on increasing the number of edges (thereby increasing graph density). Phase 3 maintains the graph sizes from Phase 1 but significantly reduces the edge capacities (from 1,000 to 10).
+
+Our primary goals are to determine the fastest algorithm in general, identify which algorithms are better suited for specific graph types, and establish the relative performance of each method. Additionally, we investigate how runtimes are affected by increasing graph density versus increasing graph size, and the impact of reduced edge capacities. We also empirically test whether the observed running times align with the algorithms' established theoretical Big-Oh complexity bounds. To ensure the statistical validity of our findings, each algorithm was run ten times per test case, and a detailed statistical analysis, including the minimum, maximum, mean, median, and standard deviation, was performed.
+
+The results of this comprehensive evaluation demonstrate that the Scaling Ford-Fulkerson algorithm exhibits the best overall performance, winning 53\% of the tests across all phases and proving to be the most resilient to variations in graph density and capacity. The standard Ford-Fulkerson algorithm secured 22\% of the victories, notably excelling on mesh graphs with low capacity. This algorithm achieved a substantial speedup, ranging from $6\times$ to $23\times$, when the capacities were uniformly dropped from 1,000 to 10. In contrast, the Preflow-Push algorithm, while winning 25\% of the tests, exhibited highly unpredictable behavior, resulting in over 34 catastrophic failures (defined as running more than 10 times slower than the best-performing algorithm in that test).
+
+
+\section{Methodology}
+Our methodology in carrying out this experiments was to generate 10 graphs of each type giving us a total of 40 input graphs. We created our own benchmark and analysis toolkit which we ran on the generated graphs. For each individual graph we ran each algorithm 10 times and collected statistics. We were primarily concerned with the average (mean) and max runtimes over all 10 runs. For each type of graph; bipartite, fixed-degree, mesh, and random, we increased the number of vertices (and in some cases edges).
+
+\section{Results}
+
+Modifying the template --- including but not limited to: adjusting
+margins, typeface sizes, line spacing, paragraph and list definitions,
+and the use of the \verb|\vspace| command to manually adjust the
+vertical spacing between elements of your work --- is not allowed.
+
+{\bfseries Your document will be returned to you for revision if
+  modifications are discovered.}
+
+\section{Future Work}
+
+This work only analyzed the effect of increasing the size of the input in terms of vertices and edges primarily. We kept other parameters fixed. Future work would involve adjusting other tunable parameters in the graph generation code to observe the effects of those modifications on the performance of our three algorithms.
+
+\section{Division of Labor}
+
+The work for this project was distributed among team members based on
+their expertise and interests. Table~\ref{tab:division} provides a
+detailed breakdown of responsibilities.
+
+\begin{table}[h]
+  \caption{Division of Labor Among Team Members}
+  \label{tab:division}
+  \begin{tabular}{ll}
+    \toprule
+    Task & Team Member(s)\\
+    \midrule
+    Ford-Fulkerson Algorithm & Headley Brissett\\
+    Scaling Ford-Fulkerson Algorithm & Eric Chu\\
+    Preflow-Push Algorithm & Chris Biju\\
+    Benchmark \& Analysis Toolkit & Dustin Cannon\\
+    \midrule
+    Presentation Slides \& Demo & Eric Chu, Headley Brissett\\
+    Final Report & Dustin Cannon, Chris Biju\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Each team member contributed significantly to their assigned
+components, with regular collaboration and code reviews on Github throughout the
+development process to ensure consistency and quality across all
+implementations.
+
+\section{Lessons Learned}
+
+Each author must be defined separately for accurate metadata
+identification.  As an exception, multiple authors may share one
+affiliation. Authors' names should not be abbreviated; use full first
+names wherever possible. Include authors' e-mail addresses whenever
+possible.
+
+%%
+%% The acknowledgments section is defined using the "acks" environment
+%% (and NOT an unnumbered section). This ensures the proper
+%% identification of the section in the article metadata, and the
+%% consistent spelling of the heading.
+\begin{acks}
+To Robert, for the bagels and explaining CMYK and color spaces.
+\end{acks}
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{sample-base}
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-sigconf.tex'.
