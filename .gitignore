@@ -11,3 +11,6 @@ GeneratedGraphs/
 GeneratedGraphs2/
 GeneratedGraphs3/
 backup/
+!Analysis/BenchmarkResultsData*
+!Analysis/BenchmarkResultsPlots*
+!Analysis/GeneratedGraphs*
