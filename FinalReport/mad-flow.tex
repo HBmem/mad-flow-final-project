@@ -1,0 +1,602 @@
+%%
+%% This is file `sample-sigconf.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `all,proceedings,bibtex,sigconf')
+%%
+%% IMPORTANT NOTICE:
+%%
+%% For the copyright see the source file.
+%%
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigconf.tex.
+%%
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%%
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%% The first command in your LaTeX source must be the \documentclass
+%% command.
+%%
+%% For submission and review of your manuscript please change the
+%% command to \documentclass[manuscript, screen, review]{acmart}.
+%%
+%% When submitting camera ready or to TAPS, please change the command
+%% to \documentclass[sigconf]{acmart} or whichever template is required
+%% for your publication.
+%%
+%%
+\documentclass[sigconf]{acmart}
+\usepackage{graphicx}
+\usepackage{multirow}
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{none}
+\copyrightyear{2025}
+\acmYear{2025}
+\acmDOI{}
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[TCSS 543]{TCSS 543: Design and Analysis of Algorithms}{Fall 2025}{University of Washington Tacoma}
+\acmISBN{}
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{An Empirical Analysis of Network Flow Algorithms}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Dustin Cannon}
+\email{dustic@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+\author{Headley Brissett}
+\email{hbriss@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+\author{Chris Biju}
+\email{chrisb10@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+\author{Eric Chu}
+\email{cwchuftw@uw.edu}
+\affiliation{%
+  \institution{University of Washington}
+  \city{Tacoma}
+  \state{WA}
+  \country{USA}
+}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Cannon et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+  We present an empirical analysis of three maximum flow algorithms (Ford-Fulkerson, Scaling Ford-Fulkerson, and Preflow-Push) across four graph types (bipartite, fixed-degree, mesh, and random). Our study employs a three-phase experimental design: Phase~1 establishes baseline performance with varying graph sizes and high edge capacities (C=1000); Phase~2 tests sensitivity to increased edge density; and Phase~3 examines the impact of reduced capacities (C=10) on algorithm performance.
+
+  Results show that Scaling Ford-Fulkerson achieves the best overall performance, winning 53\% of tests with zero catastrophic failures. Ford-Fulkerson wins 22\% of tests and excels on mesh graphs with low capacity, achieving 6--23$\times$ speedup when capacity is reduced. Preflow-Push wins 25\% but exhibits highly unpredictable behavior with 34+ catastrophic failures. Our findings validate theoretical complexity bounds while revealing that constant factors vary dramatically based on graph structure, particularly for Preflow-Push. Input graphs were generated using modified Java code for reproducibility, while all algorithms were implemented in Python.
+\end{abstract}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+
+In the field of combinatorial optimization, network flow problems constitute a fundamental class of computational challenges. The input for such a problem is a flow network, which is essentially a graph endowed with numerical capacity constraints on its edges. The objective is to construct a valid flow, consisting of numerical values assigned to each edge. This flow must adhere to two core constraints: first, the flow must not exceed the specified capacity on any edge; and second, the principle of flow conservation must be satisfied, meaning that the total incoming flow must equal the total outgoing flow at every vertex, with the exception of designated terminal nodes (the source and the sink).
+
+This study aims to provide an empirical performance evaluation of three distinct network flow algorithms: \textbf{Ford-Fulkerson}~\cite[Section 7.1]{kleinberg2006algorithm}, \textbf{Scaling Ford-Fulkerson}~\cite[Section 7.3]{kleinberg2006algorithm}, and the \textbf{Preflow-Push} algorithm~\cite[Section 7.4]{kleinberg2006algorithm}. We conduct this analysis across four different classes of input graphs (bipartite, fixed-degree, mesh, and random) by systematically adjusting the properties of the input graph. The experiment is structured into three phases to isolate the impact of different graph characteristics on performance: Phase~1 establishes baseline performance by varying graph size with high capacities (C=1000); Phase~2 tests sensitivity to increased edge density on smaller graphs; and Phase~3 examines the effect of reduced capacities (C=10) on the same graph sizes as Phase~1.
+
+Our primary goals are to determine the fastest algorithm in general, identify which algorithms are better suited for specific graph types, and establish the relative performance of each method. Additionally, we investigate how runtimes are affected by increasing graph density versus increasing graph size, and the impact of reduced edge capacities. We also empirically test whether the observed running times align with the algorithms' established theoretical Big-Oh complexity bounds. To ensure the statistical validity of our findings, each algorithm was run ten times per test case, and a detailed statistical analysis, including the minimum, maximum, mean, median, and standard deviation, was performed.
+
+The results of this comprehensive evaluation demonstrate that the Scaling Ford-Fulkerson algorithm exhibits the best overall performance, winning 53\% of the tests across all phases and proving to be the most resilient to variations in graph density and capacity. The standard Ford-Fulkerson algorithm secured 22\% of the victories, notably excelling on mesh graphs with low capacity. This algorithm achieved a substantial speedup, ranging from $6\times$ to $23\times$, when the capacities were uniformly dropped from 1,000 to 10. In contrast, the Preflow-Push algorithm, while winning 25\% of the tests, exhibited highly unpredictable behavior, resulting in over 34 catastrophic failures (defined as running more than 10 times slower than the best-performing algorithm in that test).
+
+
+\section{Methodology}
+
+\subsection{Algorithm Implementations}
+All three algorithms were implemented in Python from textbook pseudocode~\cite{kleinberg2006algorithm}:
+
+\textbf{Ford-Fulkerson}~\cite[pp.~338--344]{kleinberg2006algorithm}: We implemented the basic augmenting path algorithm using BFS to find paths from source to sink. The graph is represented as an adjacency dictionary, with residual capacities updated after each augmentation. The implementation maintains reverse edges to allow flow cancellation.
+
+\textbf{Scaling Ford-Fulkerson}~\cite[pp.~352--354]{kleinberg2006algorithm}: This variant uses capacity scaling, initializing $\Delta$ to the largest power of 2 not exceeding the maximum edge capacity. In each phase, only edges with residual capacity $\geq \Delta$ are considered for augmenting paths. After exhausting paths at the current scale, $\Delta$ is halved until $\Delta < 1$.
+
+\textbf{Preflow-Push}~\cite[pp.~357--361]{kleinberg2006algorithm}: We implemented the generic push-relabel algorithm with FIFO discharge ordering. The source is initialized at height $n$ (number of vertices), and all edges from the source are saturated. Active vertices (those with positive excess, excluding source/sink) are discharged until no active vertices remain. Our implementation uses basic discharge without advanced heuristics (gap heuristic, global relabeling, highest-label selection).
+
+\subsection{Implementation Challenges}
+Of the three algorithms, Preflow-Push was by far the most difficult to implement. We had to carefully study the textbook pseudocode to understand when and how to push excess flow, how to properly manage height labels, and how to ensure termination. The concepts of ``excess flow'' and ``active vertices'' required significant effort to translate into working code. Additionally, the lack of advanced heuristics (gap heuristic, global relabeling, highest-label selection) in our basic FIFO implementation likely explains its erratic performance. Production implementations typically include these optimizations to dramatically reduce worst-case behavior.
+
+Ford-Fulkerson and Scaling Ford-Fulkerson were considerably more straightforward to implement. The augmenting path concept is intuitive, and the main challenges were maintaining the residual graph correctly (including reverse edges) and implementing the capacity threshold for Scaling FF's BFS traversal.
+
+Beyond algorithm implementation, we faced two significant practical challenges:
+
+\textbf{Long runtimes:} Initial experiments with large graphs resulted in runtimes exceeding several hours, particularly for Preflow-Push on certain graph structures. We resolved this by reducing the maximum graph sizes tested, balancing the need for meaningful asymptotic analysis against practical time constraints.
+
+\textbf{Lack of tooling:} No existing toolkit met our needs for systematic benchmarking across multiple algorithms, graph types, and parameter configurations. We built a complete benchmark and analysis toolkit from scratch, including parallel execution support, automated statistical analysis (min, max, mean, median, standard deviation), JSON/CSV output, and automated plot generation for visual comparison of algorithm performance.
+
+\subsection{Experimental Design}
+We designed a three-phase experimental framework to systematically isolate the effects of different graph characteristics on algorithm performance. This approach allows us to distinguish between the impacts of graph size (vertices/edges), edge density, and edge capacity on the three algorithms.
+
+\begin{itemize}
+    \item \textbf{Phase 1 (Baseline):} Vary the number of vertices while keeping other parameters constant. Edge capacities range from 1 to 1000. This establishes baseline performance rankings.
+    \item \textbf{Phase 2 (Density Impact):} Use smaller graphs but increase edge density/connectivity. This tests how algorithms respond to denser graph structures.
+    \item \textbf{Phase 3 (Capacity Impact):} Use the same graph sizes as Phase 1 but reduce edge capacities to 1-10. This tests the capacity dependence of Ford-Fulkerson's $O(mC)$ complexity~\cite[pp.~344--345]{kleinberg2006algorithm}.
+\end{itemize}
+
+\subsection{Graph Types}
+We tested four distinct graph types, each representing different structural characteristics commonly encountered in network flow applications:
+
+\begin{table}[h]
+  \caption{Graph Type Descriptions}
+  \label{tab:graphtypes}
+  \begin{tabular}{lp{5.5cm}}
+    \toprule
+    Graph Type & Description\\
+    \midrule
+    \textbf{Bipartite} & Two-partition graphs with source connected to one partition and sink to the other. Models assignment and matching problems.\\
+    \textbf{Mesh} & Regular grid/lattice structure where flow moves through a matrix of vertices. Models physical network layouts.\\
+    \textbf{FixedDegree} & Each vertex has a fixed number of outgoing edges. Models uniform connectivity scenarios.\\
+    \textbf{Random} & Random graphs with specified edge density. Models general network topologies.\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Parameter Configuration}
+Table~\ref{tab:phaseparams} summarizes the key parameter differences across the three experimental phases. Phase 1 serves as the baseline with high capacity (C=1000). Phase 2 increases edge density while Phase 3 reduces capacity to C=10.
+
+\begin{table}[h]
+  \caption{Phase Parameter Configuration}
+  \label{tab:phaseparams}
+  \small
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Type & P1 (Baseline) & P2 (Density) & P3 (Low C)\\
+    \midrule
+    Bipartite & p=0.5 & p=0.8 & p=0.5, C=10\\
+    FixedDeg & 30 out & 50 out & 30 out, C=10\\
+    Mesh & C=1000 & smaller & C=10\\
+    Random & d=30 & d=60 & d=30, C=10\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Graph Size Ranges}
+Table~\ref{tab:graphsizes} shows the vertex and edge ranges for each graph type across the phases.
+
+\begin{table}[h]
+  \caption{Graph Size Ranges (Vertices / Edges)}
+  \label{tab:graphsizes}
+  \small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Graph Type & Vertices & Edges\\
+    \midrule
+    Bipartite & 102--1,602 & 1,331--321,677\\
+    FixedDegree & 102--3,002 & 3,060--90,060\\
+    Mesh & 402--40,002 & 1,180--119,800\\
+    Random & 101--1,501 & 2,947--672,543\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Graph Generation}
+Input graphs were generated using Java programs provided with the course materials, which we modified to accept command-line arguments for scriptable, reproducible generation. Each graph type uses different generation logic:
+
+\begin{itemize}
+    \item \textbf{Bipartite:} Creates two vertex partitions (source-side and sink-side) with edges between partitions based on probability $p$. Source $s$ connects to all source-side vertices; all sink-side vertices connect to sink $t$.
+    \item \textbf{Mesh:} Generates a grid of vertices with edges flowing right and down, plus source/sink connections at opposite corners.
+    \item \textbf{FixedDegree:} Each vertex (except source/sink) has exactly $k$ outgoing edges to randomly selected vertices.
+    \item \textbf{Random:} Each possible edge exists with probability proportional to density parameter.
+\end{itemize}
+
+For each phase, we generated 8--10 graphs per type with systematically increasing sizes, totaling approximately 32 graphs per phase.
+
+\subsection{Testing and Validation}
+To ensure correctness, we verified that all three algorithms produced identical maximum flow values on every input graph. Any discrepancy would indicate an implementation bug. All algorithms passed this validation across all 87+ test configurations.
+
+\subsection{Benchmarking Protocol}
+We developed a custom benchmarking toolkit in Python that supports parallel execution across multiple CPU cores. For each graph and algorithm combination:
+\begin{itemize}
+    \item Each algorithm was executed \textbf{10 times} on each graph to account for timing variance
+    \item We collected min, max, mean, median, and standard deviation of runtimes
+    \item Results were saved in both JSON and CSV formats for analysis
+    \item Automated comparison plots were generated showing algorithm performance across graph sizes
+\end{itemize}
+
+The systematic investigation varied one parameter per phase: Phase 1 varied graph size (vertices from 100 to 3,000+, edges from 1,000 to 670,000+), Phase 2 varied density parameters, and Phase 3 varied capacity (from max 1000 to max 10).
+
+\section{Results}
+
+\subsection{Phase 1: Baseline Performance}
+Phase 1 established baseline performance with high capacity edges (C=1000) and varying graph sizes. The results revealed clear patterns in algorithm behavior.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/phase1_bipartite_comparison.png}
+  \caption{Phase 1 Bipartite Graph Performance (log scale). Scaling FF consistently outperforms Ford-Fulkerson by 1.7-2.4x. Preflow-Push shows erratic behavior.}
+  \label{fig:phase1bipartite}
+\end{figure}
+
+\textbf{Key Findings:}
+\begin{itemize}
+    \item \textbf{Scaling Ford-Fulkerson (SFF)} dominated across all graph types, consistently 1.2-2.5x faster than basic Ford-Fulkerson.
+    \item \textbf{Preflow-Push (PFP)} exhibited highly erratic behavior: sometimes 2-4x faster than competitors on some random graphs, but often 10-100x slower on bipartite and fixed-degree graphs.
+    \item \textbf{Ford-Fulkerson (FF)} was predictable but consistently slower than SFF.
+\end{itemize}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/phase1_random_comparison.png}
+  \caption{Phase 1 Random Graph Performance (log scale). PFP shows unpredictable spikes at 800v and 1000v despite performing well at adjacent sizes.}
+  \label{fig:phase1random}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/phase1_fixeddegree_comparison.png}
+  \caption{Phase 1 FixedDegree Performance (log scale). PFP exhibits catastrophic failures on larger graphs, running 100-1000x slower than FF/SFF.}
+  \label{fig:phase1fixeddegree}
+\end{figure}
+
+Table~\ref{tab:phase1summary} shows the best-performing algorithm for each graph type in Phase 1, and Table~\ref{tab:phase1runtimes} provides concrete runtime examples.
+
+\begin{table}[h]
+  \caption{Phase 1 Algorithm Winners by Graph Type}
+  \label{tab:phase1summary}
+  \begin{tabular}{lll}
+    \toprule
+    Graph Type & Best Algorithm & Margin\\
+    \midrule
+    Bipartite & Scaling FF & 1.75-2.44x over FF\\
+    Mesh & Scaling FF & 1.12-1.47x over FF\\
+    FixedDegree & Scaling FF & 1.20-1.48x over FF\\
+    Random & Mixed (PFP/SFF) & PFP wins some, fails others\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \caption{Phase 1 Sample Runtimes (seconds, mean of 10 runs)}
+  \label{tab:phase1runtimes}
+  \small
+  \begin{tabular}{@{}llrrr@{}}
+    \toprule
+    Type & Size & FF & SFF & PFP\\
+    \midrule
+    Bipartite & 400$\times$400 & 2.88 & \textbf{1.32} & 85.21\\
+    Mesh & 100$\times$100 & 0.75 & \textbf{0.58} & 12.70\\
+    FixedDeg & 2000v & 0.40 & \textbf{0.30} & 159.46\\
+    Random & 600v & 0.71 & 0.45 & \textbf{0.31}\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Phase 2: Density Impact}
+Phase 2 tested higher edge density to understand how algorithms respond to more connected graphs. We increased bipartite edge probability from 0.5 to 0.8, fixed-degree edges per node from 30 to 50, and random graph density from 30 to 60.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/phase2_bipartite_comparison.png}
+  \caption{Phase 2 Bipartite Graph Performance with higher density (p=0.8). SFF remains most resistant to density increases.}
+  \label{fig:phase2bipartite}
+\end{figure}
+
+\textbf{Key Findings:}
+\begin{itemize}
+    \item \textbf{SFF proved most density-resistant}, showing only 0-10\% slowdown with increased edge density.
+    \item \textbf{FF showed moderate sensitivity}, with 20-30\% slowdowns typical.
+    \item \textbf{PFP collapsed under high density}, showing up to 18x slowdowns on dense bipartite graphs.
+\end{itemize}
+
+\begin{table}[h]
+  \caption{Phase 2: Algorithm Consistency Under Higher Density}
+  \label{tab:phase2consistency}
+  \begin{tabular}{llll}
+    \toprule
+    Algorithm & Wins & Failures & Consistency\\
+    \midrule
+    Ford-Fulkerson & 8/23 & 0 & Very High\\
+    Scaling FF & 10/23 & 0 & Very High\\
+    Preflow-Push & 5/23 & 10+ & Unpredictable\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Phase 3: Low Capacity Impact}
+Phase 3 reduced edge capacities from 1000 to 10 to test Ford-Fulkerson's theoretical $O(mC)$ dependence on capacity~\cite[pp.~344--345]{kleinberg2006algorithm}. With $C$ reduced by 100x, we expected significant FF speedup.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/phase3_mesh_comparison.png}
+  \caption{Phase 3 Mesh Graph Performance with low capacity (C=10). Ford-Fulkerson outperforms Scaling FF on mesh graphs when capacity is low.}
+  \label{fig:phase3mesh}
+\end{figure}
+
+\textbf{Key Findings:}
+\begin{itemize}
+    \item \textbf{FF achieved 6-23x speedup} compared to Phase 1 (not the theoretical 100x due to constant factors and BFS overhead).
+    \item \textbf{FF won on mesh graphs}, the only scenario where it consistently beat SFF.
+    \item \textbf{SFF achieved 1.8-7.2x speedup}, roughly matching the expected $\sim$3x from the $O(m^2 \log C)$ complexity~\cite[pp.~354--357]{kleinberg2006algorithm}.
+    \item \textbf{PFP remained erratic} regardless of capacity, confirming its $O(n^2m)$ independence from $C$~\cite[pp.~361--367]{kleinberg2006algorithm}.
+\end{itemize}
+
+\begin{table}[h]
+  \caption{Phase 3: Actual vs Expected Speedup from Capacity Reduction}
+  \label{tab:phase3speedup}
+  \begin{tabular}{lllll}
+    \toprule
+    Algorithm & Complexity & Expected & Actual & Notes\\
+    \midrule
+    FF & $O(mC)$ & 100x & 6-23x & Constant factors\\
+    SFF & $O(m^2 \log C)$ & 3x & 1.8-7.2x & Matches theory\\
+    PFP & $O(n^2m)$ & 1x & Variable & Structure-dependent\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Cross-Phase Summary}
+Aggregating results across all three phases reveals clear patterns in algorithm reliability and performance.
+
+\begin{table}[h]
+  \caption{Overall Algorithm Performance Across All Phases}
+  \label{tab:overallwins}
+  \begin{tabular}{lllll}
+    \toprule
+    Algorithm & Phase 1 & Phase 2 & Phase 3 & Total\\
+    \midrule
+    Ford-Fulkerson & 2/32 & 8/23 & 9/32 & 19/87 (22\%)\\
+    Scaling FF & 20/32 & 10/23 & 16/32 & 46/87 (53\%)\\
+    Preflow-Push & 10/32 & 5/23 & 7/32 & 22/87 (25\%)\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Critically, while Preflow-Push achieved 25\% of wins, it also suffered \textbf{34+ catastrophic failures} (defined as running more than 10x slower than the best algorithm). Neither FF nor SFF had any catastrophic failures.
+
+\subsection{Sensitivity Analysis}
+We analyzed how sensitive each algorithm is to the three key parameters: vertices ($n$), edges ($m$), and capacity ($C$).
+
+\begin{table}[h]
+  \caption{Algorithm Sensitivity to Graph Parameters}
+  \label{tab:sensitivity}
+  \small
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Algorithm & Vertices ($n$) & Edges ($m$) & Capacity ($C$)\\
+    \midrule
+    FF & Moderate & High & \textbf{Very High}\\
+    SFF & Low & Moderate & Moderate\\
+    PFP & \textbf{Very High} & High & None\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{Key observations on sensitivity:}
+\begin{itemize}
+    \item \textbf{Ford-Fulkerson} is most sensitive to capacity $C$ (confirmed by 6-23x speedup when $C$ dropped from 1000 to 10). Its $O(mC)$ complexity~\cite[pp.~344--345]{kleinberg2006algorithm} means high capacities dominate runtime.
+    \item \textbf{Scaling FF} shows balanced sensitivity across all parameters due to its $O(m^2 \log C)$ complexity~\cite[pp.~354--357]{kleinberg2006algorithm}. The logarithmic dependence on $C$ makes it resilient to capacity changes.
+    \item \textbf{Preflow-Push} is independent of $C$ but extremely sensitive to graph structure (especially $n$). Its $O(n^2 m)$ complexity~\cite[pp.~361--367]{kleinberg2006algorithm} makes large vertex counts problematic, though actual performance varies wildly based on graph topology.
+\end{itemize}
+
+\begin{table}[h]
+  \caption{Algorithm Selection Recommendations}
+  \label{tab:recommendations}
+  \begin{tabular}{lll}
+    \toprule
+    Scenario & Recommended & Confidence\\
+    \midrule
+    Unknown graph type & Scaling FF & High\\
+    Mesh graphs, low C & Ford-Fulkerson & High\\
+    Mesh graphs, high C & Scaling FF & High\\
+    Dense random graphs & Try PFP, fallback SFF & Medium\\
+    Need predictability & Scaling FF or FF & High\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Future Work}
+
+\subsection{What We Would Do Differently}
+If we were to repeat this project, we would:
+\begin{itemize}
+    \item \textbf{Implement Preflow-Push heuristics:} Adding the gap heuristic and global relabeling could dramatically reduce PFP's variance and make it competitive. This would provide a fairer comparison of the algorithm's potential.
+    \item \textbf{Use larger graph sizes:} Some of our graphs were limited by runtime constraints. With optimized implementations or more compute time, testing on graphs with millions of edges would reveal asymptotic behavior more clearly.
+    \item \textbf{Add more intermediate capacity values:} We tested C=1000 and C=10. Testing C=100, C=50, etc. would reveal the inflection point where FF becomes competitive with SFF.
+\end{itemize}
+
+\subsection{Future Experiments}
+Several interesting experiments emerge from our findings:
+\begin{itemize}
+    \item \textbf{Graph structure analysis:} Why does Preflow-Push fail catastrophically on some 500-vertex graphs but succeed on 1500-vertex graphs? A systematic study of which structural properties (diameter, clustering coefficient, degree distribution) correlate with PFP performance would be valuable.
+    \item \textbf{Hybrid algorithms:} Could we build an algorithm selector that chooses FF, SFF, or PFP based on graph properties? Our data suggests this is feasible.
+    \item \textbf{Alternative implementations:} Testing Dinic's algorithm or the highest-label variant of Preflow-Push would expand the comparison.
+\end{itemize}
+
+\subsection{Potential Applications}
+Our implementations could be applied to real-world network flow problems such as:
+\begin{itemize}
+    \item \textbf{Transportation networks:} Finding maximum traffic flow through road networks, where mesh-like structures are common and our results show FF/SFF perform well.
+    \item \textbf{Bipartite matching:} Assignment problems (jobs to workers, students to projects) map directly to bipartite max-flow, where SFF showed consistent dominance.
+    \item \textbf{Image segmentation:} Min-cut/max-flow algorithms are used in computer vision; our findings on graph structure sensitivity could guide algorithm selection.
+\end{itemize}
+
+\section{Division of Labor}
+
+The work for this project was distributed among team members based on
+their expertise and interests. Table~\ref{tab:division} provides a
+detailed breakdown of responsibilities.
+
+\begin{table}[h]
+  \caption{Division of Labor Among Team Members}
+  \label{tab:division}
+  \small
+  \begin{tabular}{@{}lp{4cm}@{}}
+    \toprule
+    Task & Team Member(s)\\
+    \midrule
+    Ford-Fulkerson & Headley Brissett\\
+    Scaling Ford-Fulkerson & Eric Chu\\
+    Preflow-Push & Chris Biju\\
+    Benchmark Toolkit & Dustin Cannon\\
+    \midrule
+    Presentation \& Demo & H.~Brissett, C.~Biju, D.~Cannon\\
+    Final Report & All members\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Each team member contributed significantly to their assigned
+components, with regular collaboration and code reviews on Github throughout the
+development process to ensure consistency and quality across all
+implementations.
+
+\section{Lessons Learned}
+
+\subsection{Theoretical vs Practical Complexity}
+Our experiments validated the theoretical complexity bounds while revealing important practical nuances:
+
+\begin{itemize}
+    \item \textbf{Big-O bounds always held}: No algorithm violated its theoretical worst-case bound. However, the \textit{constant factors} varied dramatically, by 100-1000x for Preflow-Push between ``friendly'' and ``hostile'' graph structures.
+    \item \textbf{Capacity dependence matters}: Ford-Fulkerson's $O(mC)$ complexity~\cite[pp.~344--345]{kleinberg2006algorithm} made it the clear loser with high capacities but competitive with low capacities. This confirms capacity is a critical factor in algorithm selection.
+    \item \textbf{Average vs worst case}: SFF's $O(m^2 \log C)$~\cite[pp.~354--357]{kleinberg2006algorithm} provided more predictable performance than PFP's $O(n^2m)$~\cite[pp.~361--367]{kleinberg2006algorithm}, even though PFP sometimes achieved better results on specific graphs.
+\end{itemize}
+
+\subsection{Implementation Insights}
+Building these algorithms from scratch taught us several practical lessons:
+
+\begin{itemize}
+    \item \textbf{Preflow-Push requires heuristics}: Our basic FIFO discharge implementation lacked production-level optimizations (gap heuristic, global relabeling, highest-label selection). These missing heuristics likely explain the erratic performance; production implementations can reduce variance by orders of magnitude.
+    \item \textbf{Simple algorithms are robust}: Ford-Fulkerson and Scaling Ford-Fulkerson use straightforward BFS-based augmenting paths. This simplicity translated to consistent, predictable performance with no catastrophic failures.
+    \item \textbf{Graph structure matters more than size}: Preflow-Push failed catastrophically on some 500-vertex graphs while succeeding on 1500-vertex graphs of different structure. The relationship between graph topology and algorithm behavior deserves further study.
+\end{itemize}
+
+\subsection{Experimental Methodology}
+The three-phase experimental design proved valuable:
+
+\begin{itemize}
+    \item \textbf{Isolating variables}: By changing only one parameter per phase (size, density, capacity), we could attribute performance differences to specific causes.
+    \item \textbf{Statistical rigor}: Running 10 trials per test revealed that Preflow-Push had high variance even on identical inputs, while FF and SFF were highly consistent.
+    \item \textbf{Automated tooling}: Our custom benchmark toolkit enabled rapid iteration and reproducible results, allowing us to test 87 configurations across three algorithms efficiently.
+\end{itemize}
+
+\subsection{Practical Recommendations}
+Based on our findings, we offer the following guidance for practitioners:
+
+\begin{enumerate}
+    \item \textbf{Default to Scaling Ford-Fulkerson}: It won 53\% of tests with zero catastrophic failures. The capacity-scaling technique provides excellent performance across diverse graph types.
+    \item \textbf{Use Ford-Fulkerson for mesh graphs with low capacity}: This is the one scenario where the simpler algorithm clearly wins.
+    \item \textbf{Avoid Preflow-Push without extensive testing}: While it can be fastest on favorable inputs, the 34+ catastrophic failures make it unsuitable for production use without graph-specific validation and advanced heuristics.
+    \item \textbf{Consider capacity when choosing algorithms}: If edge capacities are known to be small, Ford-Fulkerson's simplicity may outweigh Scaling FF's sophistication.
+\end{enumerate}
+
+%%
+%% The acknowledgments section is defined using the "acks" environment
+%% (and NOT an unnumbered section). This ensures the proper
+%% identification of the section in the article metadata, and the
+%% consistent spelling of the heading.
+\begin{acks}
+We thank the TCSS 543 course staff at the University of Washington Tacoma for providing the graph generation code and guidance on this project.
+\end{acks}
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{sample-base}
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-sigconf.tex'.
